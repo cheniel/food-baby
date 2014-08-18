@@ -38,6 +38,9 @@ static char *dateString;
 static BitmapLayer *sidebarLayer;
 static GBitmap *sidebarImg;
 
+static BitmapLayer *spriteLayer;
+static GBitmap *spriteImg;
+
 // placeholders
 static TextLayer *spritePH;
 
@@ -112,26 +115,34 @@ static void load(Window *window) {
         fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
     text_layer_set_text(recText, "Drink more water!");
 
-    /* create sidebar*/
+    /* create sidebar */
     sidebarImg = gbitmap_create_with_resource(RESOURCE_ID_SIDEBAR);
     sidebarLayer = bitmap_layer_create(GRect(114, 46, 30, 85));
     bitmap_layer_set_bitmap(sidebarLayer, sidebarImg);
+
+    /* create sprite */
+    spriteImg = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_IDLE);
+    spriteLayer = bitmap_layer_create(GRect(10, 90, 40, 40));
+    bitmap_layer_set_bitmap(spriteLayer, spriteImg);
 
     /* add text layers to window */
     layer_add_child(window_layer, text_layer_get_layer(timeText));
     layer_add_child(window_layer, text_layer_get_layer(dateText));
     layer_add_child(window_layer, text_layer_get_layer(recText));
     layer_add_child(window_layer, bitmap_layer_get_layer(sidebarLayer));
+    layer_add_child(window_layer, bitmap_layer_get_layer(spriteLayer));
 
 
 /* ------------------------ USED TO DETERMINE SPACING ----------------------- */
 
+    /*
     spritePH = text_layer_create((GRect) { 
         .origin = { 10, 90 }, 
         .size = { 45, 45 } 
     });
 
     layer_add_child(window_layer, text_layer_get_layer(spritePH));
+    */
 }
 
 static void unload(Window *window) {
@@ -140,10 +151,13 @@ static void unload(Window *window) {
     free(timeString);
     free(dateString);
 
-    text_layer_destroy(spritePH);
+    // text_layer_destroy(spritePH);
 
     gbitmap_destroy(sidebarImg);
     bitmap_layer_destroy(sidebarLayer);
+
+    gbitmap_destroy(spriteImg);
+    bitmap_layer_destroy(spriteLayer);
 
     tick_timer_service_unsubscribe();
 }
