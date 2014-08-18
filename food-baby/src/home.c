@@ -41,8 +41,6 @@ static GBitmap *sidebarImg;
 static BitmapLayer *spriteLayer;
 static GBitmap *spriteImg;
 
-// placeholders
-static TextLayer *spritePH;
 
 // ---------------- Private prototypes
 static void select_click_handler(ClickRecognizerRef recognizer, void *context);
@@ -132,17 +130,6 @@ static void load(Window *window) {
     layer_add_child(window_layer, bitmap_layer_get_layer(sidebarLayer));
     layer_add_child(window_layer, bitmap_layer_get_layer(spriteLayer));
 
-
-/* ------------------------ USED TO DETERMINE SPACING ----------------------- */
-
-    /*
-    spritePH = text_layer_create((GRect) { 
-        .origin = { 10, 90 }, 
-        .size = { 45, 45 } 
-    });
-
-    layer_add_child(window_layer, text_layer_get_layer(spritePH));
-    */
 }
 
 static void unload(Window *window) {
@@ -150,8 +137,6 @@ static void unload(Window *window) {
     text_layer_destroy(dateText);
     free(timeString);
     free(dateString);
-
-    // text_layer_destroy(spritePH);
 
     gbitmap_destroy(sidebarImg);
     bitmap_layer_destroy(sidebarLayer);
