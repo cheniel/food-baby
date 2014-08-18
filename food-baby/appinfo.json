@@ -1,0 +1,23 @@
+{
+  "uuid": "a68ca36b-c578-4c3b-85f7-f4d02e9e283c",
+  "shortName": "food-baby",
+  "longName": "food-baby",
+  "companyName": "cheniel",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {
+    "dummy": 0
+  },
+  "resources": {
+    "media": [
+      {
+        "type": "png",
+        "name": "SIDEBAR",
+        "file": "sidebar.png"
+      }
+    ]
+  }
+}
