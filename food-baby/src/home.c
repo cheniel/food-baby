@@ -41,6 +41,14 @@ static GBitmap *sidebarImg;
 static BitmapLayer *spriteLayer;
 static GBitmap *spriteImg;
 
+static BitmapLayer *foodIconLayer;
+static GBitmap *foodIcon;
+
+static BitmapLayer *waterIconLayer;
+static GBitmap *waterIcon;
+
+static BitmapLayer *logIconLayer;
+static GBitmap *logIcon;
 
 // ---------------- Private prototypes
 static void select_click_handler(ClickRecognizerRef recognizer, void *context);
@@ -118,6 +126,21 @@ static void load(Window *window) {
     sidebarLayer = bitmap_layer_create(GRect(114, 46, 30, 85));
     bitmap_layer_set_bitmap(sidebarLayer, sidebarImg);
 
+    /* create food icon */
+    foodIcon = gbitmap_create_with_resource(RESOURCE_ID_PLACEHOLDER);
+    foodIconLayer = bitmap_layer_create(GRect(118, 49, 25, 25));
+    bitmap_layer_set_bitmap(foodIconLayer, foodIcon);
+
+    /* create water icon */
+    waterIcon = gbitmap_create_with_resource(RESOURCE_ID_PLACEHOLDER);
+    waterIconLayer = bitmap_layer_create(GRect(118, 76, 25, 25));
+    bitmap_layer_set_bitmap(waterIconLayer, waterIcon);
+
+    /* create log icon */
+    logIcon = gbitmap_create_with_resource(RESOURCE_ID_PLACEHOLDER);
+    logIconLayer = bitmap_layer_create(GRect(118, 103, 25, 25));
+    bitmap_layer_set_bitmap(logIconLayer, logIcon);
+
     /* create sprite */
     spriteImg = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_IDLE);
     spriteLayer = bitmap_layer_create(GRect(10, 90, 40, 40));
@@ -129,7 +152,9 @@ static void load(Window *window) {
     layer_add_child(window_layer, text_layer_get_layer(recText));
     layer_add_child(window_layer, bitmap_layer_get_layer(sidebarLayer));
     layer_add_child(window_layer, bitmap_layer_get_layer(spriteLayer));
-
+    layer_add_child(window_layer, bitmap_layer_get_layer(foodIconLayer));
+    layer_add_child(window_layer, bitmap_layer_get_layer(waterIconLayer));
+    layer_add_child(window_layer, bitmap_layer_get_layer(logIconLayer));
 }
 
 static void unload(Window *window) {
@@ -138,11 +163,14 @@ static void unload(Window *window) {
     free(timeString);
     free(dateString);
 
-    gbitmap_destroy(sidebarImg);
     bitmap_layer_destroy(sidebarLayer);
+    gbitmap_destroy(sidebarImg);
 
-    gbitmap_destroy(spriteImg);
     bitmap_layer_destroy(spriteLayer);
+    gbitmap_destroy(spriteImg);
+
+    bitmap_layer_destroy(foodIconLayer);
+    gbitmap_destroy(foodIcon);
 
     tick_timer_service_unsubscribe();
 }
