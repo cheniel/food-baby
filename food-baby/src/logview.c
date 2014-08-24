@@ -39,6 +39,8 @@ Window *logInit() {
 	  .unload = unload,
 	});	
 
+  window_set_background_color(window, BACKGROUND_COLOR);
+
 	return window;
 }
 

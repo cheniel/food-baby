@@ -132,7 +132,7 @@ static void load(Window *window) {
     bitmap_layer_set_bitmap(foodIconLayer, foodIcon);
 
     /* create water icon */
-    waterIcon = gbitmap_create_with_resource(RESOURCE_ID_PLACEHOLDER);
+    waterIcon = gbitmap_create_with_resource(RESOURCE_ID_WATER);
     waterIconLayer = bitmap_layer_create(GRect(118, 76, 25, 25));
     bitmap_layer_set_bitmap(waterIconLayer, waterIcon);
 
