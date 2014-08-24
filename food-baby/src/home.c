@@ -127,7 +127,7 @@ static void load(Window *window) {
     bitmap_layer_set_bitmap(sidebarLayer, sidebarImg);
 
     /* create food icon */
-    foodIcon = gbitmap_create_with_resource(RESOURCE_ID_PLACEHOLDER);
+    foodIcon = gbitmap_create_with_resource(RESOURCE_ID_FOOD);
     foodIconLayer = bitmap_layer_create(GRect(118, 49, 25, 25));
     bitmap_layer_set_bitmap(foodIconLayer, foodIcon);
 

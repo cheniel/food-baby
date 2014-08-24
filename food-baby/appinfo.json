@@ -32,6 +32,11 @@
 			"type": "png",
 			"name": "WATER",
 			"file": "water.png"	
+			},
+			{
+			"type": "png",
+			"name": "FOOD",
+			"file": "food.png"	
 			}
 	    ]
   }
