@@ -1,7 +1,7 @@
 {
 	"uuid": "a68ca36b-c578-4c3b-85f7-f4d02e9e283c",
-	"shortName": "food-baby",
-	"longName": "food-baby",
+	"shortName": "Food Baby",
+	"longName": "Food Baby",
 	"companyName": "cheniel",
 	"versionCode": 1,
 	"versionLabel": "1.0.0",
@@ -37,6 +37,11 @@
 			"type": "png",
 			"name": "FOOD",
 			"file": "food.png"	
+			},
+			{
+			"type": "png",
+			"name": "LOG",
+			"file": "log.png"	
 			}
 	    ]
   }

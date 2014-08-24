@@ -123,22 +123,22 @@ static void load(Window *window) {
 
     /* create sidebar */
     sidebarImg = gbitmap_create_with_resource(RESOURCE_ID_SIDEBAR);
-    sidebarLayer = bitmap_layer_create(GRect(114, 46, 30, 85));
+    sidebarLayer = bitmap_layer_create(GRect(117, 46, 30, 85));
     bitmap_layer_set_bitmap(sidebarLayer, sidebarImg);
 
     /* create food icon */
     foodIcon = gbitmap_create_with_resource(RESOURCE_ID_FOOD);
-    foodIconLayer = bitmap_layer_create(GRect(118, 49, 25, 25));
+    foodIconLayer = bitmap_layer_create(GRect(119, 49, 25, 25));
     bitmap_layer_set_bitmap(foodIconLayer, foodIcon);
 
     /* create water icon */
     waterIcon = gbitmap_create_with_resource(RESOURCE_ID_WATER);
-    waterIconLayer = bitmap_layer_create(GRect(118, 76, 25, 25));
+    waterIconLayer = bitmap_layer_create(GRect(119, 76, 25, 25));
     bitmap_layer_set_bitmap(waterIconLayer, waterIcon);
 
     /* create log icon */
-    logIcon = gbitmap_create_with_resource(RESOURCE_ID_PLACEHOLDER);
-    logIconLayer = bitmap_layer_create(GRect(118, 103, 25, 25));
+    logIcon = gbitmap_create_with_resource(RESOURCE_ID_LOG);
+    logIconLayer = bitmap_layer_create(GRect(119, 103, 25, 25));
     bitmap_layer_set_bitmap(logIconLayer, logIcon);
 
     /* create sprite */
