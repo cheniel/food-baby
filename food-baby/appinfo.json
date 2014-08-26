@@ -14,34 +14,40 @@
 	"resources": {
 		"media": [
 			{
-			"type": "png",
-			"name": "SIDEBAR",
-			"file": "sidebar.png"
+				"type": "png",
+				"name": "ICON",
+				"file": "foodbaby.png",
+				"menuIcon" : true
 			},
 			{
-			"type": "png",
-			"name": "SPRITE_IDLE",
-			"file": "spritemaybe.png"
+				"type": "png",
+				"name": "SIDEBAR",
+				"file": "sidebar.png"
 			},
 			{
-			"type": "png",
-			"name": "PLACEHOLDER",
-			"file": "placeholder.png"
+				"type": "png",
+				"name": "SPRITE_IDLE",
+				"file": "foodbaby.png"
 			},
 			{
-			"type": "png",
-			"name": "WATER",
-			"file": "water.png"	
+				"type": "png",
+				"name": "PLACEHOLDER",
+				"file": "placeholder.png"
 			},
 			{
-			"type": "png",
-			"name": "FOOD",
-			"file": "food.png"	
+				"type": "png",
+				"name": "WATER",
+				"file": "water.png"	
 			},
 			{
-			"type": "png",
-			"name": "LOG",
-			"file": "logWider.png"	
+				"type": "png",
+				"name": "FOOD",
+				"file": "food.png"	
+			},
+			{
+				"type": "png",
+				"name": "LOG",
+				"file": "logWider.png"	
 			}
 	    ]
   }
