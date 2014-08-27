@@ -19,6 +19,7 @@
 #include "home.h"
 #include "foodSelect.h"
 #include "logview.h"
+#include "data.h"
 
 // ---------------- Constant definitions
 
@@ -49,6 +50,7 @@ static void init(void) {
     foodSelect = foodInit();
     logview = logInit();
 
+    initData();
     srand(time(NULL)); // for random ops
 
     window_stack_push(home, ANIMATION_SETTING);
