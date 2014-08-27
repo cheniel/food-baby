@@ -55,14 +55,14 @@ char* servingSizeDairy[] = {
   "e.g. 1/2 cup of ice cream",
   "e.g. a cup of froyo",
   "e.g. a cup of soymilk",
-  "e.g. 1 string cheese",
+  "e.g. a string cheese",
   "e.g. a slice of cheese"
 };
 
 char* servingSizeProteins[] = {
   "e.g. 3 oz of beef",
   "e.g. 3 oz of chicken",
-  "e.g. 3 oz of fish"
+  "e.g. 3 oz of fish",
   "e.g. 3 oz of pork",
   "e.g. a egg",
   "e.g. 1/2 cup of beans",
