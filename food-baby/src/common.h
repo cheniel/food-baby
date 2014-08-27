@@ -22,5 +22,6 @@
 void goToLog();
 void goToFoodSelect();
 void setTextLayerDefaults(TextLayer *textlayer);
+int randomInRange(unsigned int min, unsigned int max);
 
 #endif // COMMON_H

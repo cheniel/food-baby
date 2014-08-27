@@ -49,6 +49,7 @@ static void init(void) {
     foodSelect = foodInit();
     logview = logInit();
 
+    srand(time(NULL)); // for random ops
 
     window_stack_push(home, ANIMATION_SETTING);
 }

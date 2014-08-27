@@ -40,7 +40,6 @@ typedef struct servingCount {
 // ---------------- Public Variables
 servingCount userServings;
 
-
 // ---------------- Prototypes/Macros
 void initData();
 
