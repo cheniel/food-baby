@@ -19,7 +19,7 @@
 // static const int = 5
 
 // ---------------- Macro definitions
-#define NUM_ROWS 9
+#define NUM_ROWS 10
 #define COL_WIDTH 85
 #define ROW_HEIGHT 16
 #define TABLE_XPOS 20
@@ -48,6 +48,7 @@ Window *logInit() {
 	  .unload = unload,
 	});	
 
+  window_set_fullscreen(window, true);
 	return window;
 }
 
@@ -81,7 +82,7 @@ static void load(Window *window) {
   text_layer_set_text(foodHeader, "Food Servings");
 
   TextLayer* activityHeader = text_layer_create((GRect) { 
-    .origin = { 5, ROW_HEIGHT * 6 }, // row 6
+    .origin = { 5, ROW_HEIGHT * 7 }, // row 6
     .size = { bounds.size.w, ROW_HEIGHT } 
   });
   text_layer_set_text(activityHeader, "Activity");
@@ -90,13 +91,14 @@ static void load(Window *window) {
   initializeTable();
 
   int foodGroups = 1;
+  assignRow(foodGroups++, "Water", userServings.water);
   assignRow(foodGroups++, "Grains", userServings.grains);
   assignRow(foodGroups++, "Veggies", userServings.veggies);
   assignRow(foodGroups++, "Fruits", userServings.fruit);
   assignRow(foodGroups++, "Dairy", userServings.dairy);
   assignRow(foodGroups++, "Protein", userServings.protein);
 
-  int activityGroups = 7;
+  int activityGroups = 8;
   assignRow(activityGroups++, "Today", 0);
   assignRow(activityGroups++, "Best", 0);
 

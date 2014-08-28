@@ -16,6 +16,7 @@
 
 // ---------------- Constant definitions
 const servingCount minRecServings = {
+	.water = 6,
 	.grains = 6,
 	.veggies = 3,
 	.fruit = 2,
@@ -24,6 +25,7 @@ const servingCount minRecServings = {
 };
 
 const servingCount maxRecServings = {
+	.water = 8,
 	.grains = 11,
 	.veggies = 5,
 	.fruit = 4,

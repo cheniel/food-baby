@@ -14,6 +14,7 @@
 
 // ---------------- Structures/Types
 typedef struct servingCount {
+	int water;
 	int grains;
 	int veggies;
 	int fruit;
