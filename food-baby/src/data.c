@@ -48,6 +48,7 @@ servingCount userServings;
 
 void initData() {
  	userServings = (servingCount) {
+ 		.water = 0,
  		.grains = 0,
  		.veggies = 0,
  		.fruit = 0,

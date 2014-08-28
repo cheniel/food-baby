@@ -16,6 +16,7 @@
 
 // ---------------- Local includes  e.g., "file.h"
 #include "common.h"
+#include "data.h"
 
 // ---------------- Constant definitions
 // static const int = 5
@@ -49,6 +50,7 @@ static GBitmap *waterIcon;
 
 static BitmapLayer *logIconLayer;
 static GBitmap *logIcon;
+extern servingCount userServings;
 
 // ---------------- Private prototypes
 static void select_click_handler(ClickRecognizerRef recognizer, void *context);
@@ -185,7 +187,8 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-    //TODO increment water count
+    // increment water count
+    userServings.water++;
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
