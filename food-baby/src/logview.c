@@ -35,6 +35,8 @@ static char* col2values[NUM_ROWS];
 static TextLayer* foodHeader;
 static TextLayer* activityHeader;
 extern servingCount userServings;
+extern int activityToday;
+extern int activityRecord;
 
 // ---------------- Private prototypes
 static void load(Window *window);
@@ -109,8 +111,8 @@ static void load(Window *window) {
   assignRow(foodGroups++, "Protein", userServings.protein);
 
   int activityGroups = 8;
-  assignRow(activityGroups++, "Today", 0);
-  assignRow(activityGroups++, "Best", 0); //TODO 155 becomes all of col2
+  assignRow(activityGroups++, "Today", activityToday);
+  assignRow(activityGroups++, "Best", activityRecord); 
 
   addTextLayersToWindow(windowLayer);
 }

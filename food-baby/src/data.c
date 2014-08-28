@@ -40,6 +40,8 @@ const servingCount maxRecServings = {
 
 // ---------------- Private variables
 servingCount userServings;
+int activityToday;
+int activityRecord;
 
 // ---------------- Private prototypes
 
@@ -55,6 +57,9 @@ void initData() {
  		.dairy = 0,
  		.protein = 0
  	};
+
+ 	activityToday = 0;
+ 	activityRecord = 0;
 }
 
 
