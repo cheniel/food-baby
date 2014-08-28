@@ -32,6 +32,7 @@ extern Window *home;
 extern Window *foodSelect;
 extern Window *logview;
 extern int activityToday;
+extern int activityRecord;
 
 // ---------------- Private prototypes
 int main(void);
@@ -49,6 +50,8 @@ int main(void) {
 
 static void tapHandler(AccelAxisType axis, int32_t direction) {
     activityToday++;
+
+    if (activityToday > activityRecord) { activityRecord = activityToday; }
 }
 
 static void init(void) {

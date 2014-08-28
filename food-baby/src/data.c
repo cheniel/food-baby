@@ -73,6 +73,23 @@ void initData() {
  					persist_read_int(PKEY_ACT_RECORD):activityToday;
 }
 
+void resetDailyData() {
+ 	userServings = (ServingCount) {
+ 		.water = 0,
+ 		.grains = 0,
+ 		.veggies = 0,
+ 		.fruit = 0,
+ 		.dairy = 0,
+ 		.protein = 0
+ 	};
+
+ 	activityToday = 0;
+}
+
+void resetRecord() {
+	activityRecord = 0;
+}
+
 void saveData() {
 	persist_write_int(PKEY_ACT_TODAY, activityToday);
 	persist_write_int(PKEY_ACT_RECORD, activityRecord);
