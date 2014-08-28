@@ -142,38 +142,38 @@ static void load(Window *window) {
   int num_a_items = 0;
 
   menu_items[num_a_items++] = (SimpleMenuItem){
-    .title = "Grains",
-    .subtitle = getServingExample("Grains"),
+    .title = "grains",
+    .subtitle = getServingExample("grains"),
     .callback = grainSelectCallback,
   };
 
   menu_items[num_a_items++] = (SimpleMenuItem){
-    .title = "Vegetables",
-    .subtitle = getServingExample("Vegetables"),
+    .title = "vegetables",
+    .subtitle = getServingExample("vegetables"),
     .callback = vegetableSelectCallback,
   };
 
   menu_items[num_a_items++] = (SimpleMenuItem){
-    .title = "Fruits",
-    .subtitle = getServingExample("Fruits"),
+    .title = "fruits",
+    .subtitle = getServingExample("fruits"),
     .callback = fruitSelectCallback,
   };
 
   menu_items[num_a_items++] = (SimpleMenuItem){
-    .title = "Dairy",
-    .subtitle = getServingExample("Dairy"),
+    .title = "dairy",
+    .subtitle = getServingExample("dairy"),
     .callback = dairySelectCallback,
   };
 
   menu_items[num_a_items++] = (SimpleMenuItem){
-    .title = "Proteins",
-    .subtitle = getServingExample("Proteins"),
+    .title = "proteins",
+    .subtitle = getServingExample("proteins"),
     .callback = proteinSelectCallback,
   };
 
   // Bind the menu items to the corresponding menu sections
   menu_sections[0] = (SimpleMenuSection){
-    .title = "Log your servings!",
+    .title = "log your servings!",
     .num_items = NUM_MENU_ITEMS,
     .items = menu_items,
   };
@@ -194,15 +194,15 @@ static void unload(Window *window) {
 char* getServingExample(char* foodGroup) {
   char** examples;
 
-  if (!strncmp(foodGroup, "Grains", MAX_COMPARE_SIZE)) {
+  if (!strncmp(foodGroup, "grains", MAX_COMPARE_SIZE)) {
     examples = servingSizeGrains;
-  } else if (!strncmp(foodGroup, "Vegetables", MAX_COMPARE_SIZE)) {
+  } else if (!strncmp(foodGroup, "vegetables", MAX_COMPARE_SIZE)) {
     examples = servingSizeVegetables;
-  } else if (!strncmp(foodGroup, "Fruits", MAX_COMPARE_SIZE)) {
+  } else if (!strncmp(foodGroup, "fruits", MAX_COMPARE_SIZE)) {
     examples = servingSizeFruits;
-  } else if (!strncmp(foodGroup, "Dairy", MAX_COMPARE_SIZE)) {
+  } else if (!strncmp(foodGroup, "dairy", MAX_COMPARE_SIZE)) {
     examples = servingSizeDairy;
-  } else if (!strncmp(foodGroup, "Proteins", MAX_COMPARE_SIZE)) {
+  } else if (!strncmp(foodGroup, "proteins", MAX_COMPARE_SIZE)) {
     examples = servingSizeProteins;
   } else {
     return "ERR inv group";

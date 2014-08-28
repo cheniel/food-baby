@@ -13,6 +13,7 @@
 
 // ---------------- System includes e.g., <stdio.h>
 #include <pebble.h>
+#include <ctype.h>
 
 // ---------------- Local includes  e.g., "file.h"
 #include "common.h"
@@ -121,7 +122,7 @@ static void load(Window *window) {
     setTextLayerDefaults(recText);
     text_layer_set_font(recText, 
         fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
-    text_layer_set_text(recText, "Drink more water!");
+    text_layer_set_text(recText, "drink more water!");
 
     /* create sidebar */
     sidebarImg = gbitmap_create_with_resource(RESOURCE_ID_SIDEBAR);
@@ -227,6 +228,9 @@ static void updateTime(struct tm *tick_time) {
 
 static void updateDate(struct tm *tick_time) {
     strftime(dateString, MAX_DATE_CHAR, DATE_FORMAT, tick_time);
+    for(int i = 0; dateString[i]; i++){
+      dateString[i] = tolower((unsigned char) dateString[i]);
+    }
     text_layer_set_text(dateText, dateString);    
 }
 

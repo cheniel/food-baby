@@ -85,13 +85,13 @@ static void setUpHeaders(GRect bounds) {
     .origin = { 5, 0 }, // row 0
     .size = { bounds.size.w, ROW_HEIGHT } 
   });
-  text_layer_set_text(foodHeader, "Food Servings");
+  text_layer_set_text(foodHeader, "food servings");
 
   activityHeader = text_layer_create((GRect) { 
     .origin = { 5, ROW_HEIGHT * 7 }, // row 6
     .size = { bounds.size.w, ROW_HEIGHT } 
   });
-  text_layer_set_text(activityHeader, "Activity");  
+  text_layer_set_text(activityHeader, "activity");  
 }
 
 static void load(Window *window) {
@@ -103,16 +103,16 @@ static void load(Window *window) {
   setUpHeaders(bounds);
 
   int foodGroups = 1;
-  assignRow(foodGroups++, "Water (8 oz)", userServings.water);
-  assignRow(foodGroups++, "Grains", userServings.grains);
-  assignRow(foodGroups++, "Veggies", userServings.veggies);
-  assignRow(foodGroups++, "Fruits", userServings.fruit);
-  assignRow(foodGroups++, "Dairy", userServings.dairy);
-  assignRow(foodGroups++, "Protein", userServings.protein);
+  assignRow(foodGroups++, "water (8 oz)", userServings.water);
+  assignRow(foodGroups++, "grains", userServings.grains);
+  assignRow(foodGroups++, "veggies", userServings.veggies);
+  assignRow(foodGroups++, "fruits", userServings.fruit);
+  assignRow(foodGroups++, "dairy", userServings.dairy);
+  assignRow(foodGroups++, "protein", userServings.protein);
 
   int activityGroups = 8;
-  assignRow(activityGroups++, "Today", activityToday);
-  assignRow(activityGroups++, "Best", activityRecord); 
+  assignRow(activityGroups++, "today", activityToday);
+  assignRow(activityGroups++, "best", activityRecord); 
 
   addTextLayersToWindow(windowLayer);
 }

@@ -34,6 +34,7 @@ const ServingCount maxRecServings = {
 };
 
 // ---------------- Macro definitions
+
 // keys for persistant storage
 #define PKEY_ACT_TODAY 0
 #define PKEY_ACT_RECORD 1
@@ -69,7 +70,7 @@ void initData() {
  	activityToday = persist_exists(PKEY_ACT_TODAY)?
  					persist_read_int(PKEY_ACT_TODAY):0;
  	activityRecord = persist_exists(PKEY_ACT_RECORD)?
- 					persist_read_int(PKEY_ACT_RECORD):0;
+ 					persist_read_int(PKEY_ACT_RECORD):activityToday;
 }
 
 void saveData() {
