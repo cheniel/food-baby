@@ -13,26 +13,31 @@
 
 // ---------------- Local includes  e.g., "file.h"
 #include "common.h"
+#include "data.h"
  
 // ---------------- Constant definitions
 // static const int = 5
 
 // ---------------- Macro definitions
 #define NUM_ROWS 9
-#define COL_WIDTH 50
+#define COL_WIDTH 85
 #define ROW_HEIGHT 16
-#define TABLE_XPOS 10
+#define TABLE_XPOS 20
 #define NORMAL_FONT fonts_get_system_font(FONT_KEY_GOTHIC_14)
+#define MAX_COUNT_LENGTH 6
 
 // ---------------- Structures/Types
 
 // ---------------- Private variables
 static TextLayer* column1[NUM_ROWS];
 static TextLayer* column2[NUM_ROWS];
+extern servingCount userServings;
 
 // ---------------- Private prototypes
 static void load(Window *window);
 static void unload(Window *window);
+static void assignRow(int rowNumber, char* col1, int col2);
+static void initializeTable();
 
 /* ========================================================================== */
 
@@ -70,13 +75,13 @@ static void load(Window *window) {
 
   // set up header rows
   TextLayer* foodHeader = text_layer_create((GRect) { 
-    .origin = { 0, 0 }, // row 0
+    .origin = { 5, 0 }, // row 0
     .size = { bounds.size.w, ROW_HEIGHT } 
   });
   text_layer_set_text(foodHeader, "Food Servings");
 
   TextLayer* activityHeader = text_layer_create((GRect) { 
-    .origin = { 0, ROW_HEIGHT * 6 }, // row 6
+    .origin = { 5, ROW_HEIGHT * 6 }, // row 6
     .size = { bounds.size.w, ROW_HEIGHT } 
   });
   text_layer_set_text(activityHeader, "Activity");
@@ -84,10 +89,19 @@ static void load(Window *window) {
   // initialize table
   initializeTable();
 
+  int foodGroups = 1;
+  assignRow(foodGroups++, "Grains", userServings.grains);
+  assignRow(foodGroups++, "Veggies", userServings.veggies);
+  assignRow(foodGroups++, "Fruits", userServings.fruit);
+  assignRow(foodGroups++, "Dairy", userServings.dairy);
+  assignRow(foodGroups++, "Protein", userServings.protein);
+
+  int activityGroups = 7;
+  assignRow(activityGroups++, "Today", 0);
+  assignRow(activityGroups++, "Best", 0);
+
   // add table to window
   for (int row = 0; row < NUM_ROWS; row++) {
-    text_layer_set_text(column1[row], "testing");
-    text_layer_set_text(column2[row], "1234");
     layer_add_child(window_layer, text_layer_get_layer(column1[row]));
     layer_add_child(window_layer, text_layer_get_layer(column2[row]));
   }
@@ -95,6 +109,16 @@ static void load(Window *window) {
   // add header rows to table
   layer_add_child(window_layer, text_layer_get_layer(foodHeader));
   layer_add_child(window_layer, text_layer_get_layer(activityHeader));
+}
+
+static void assignRow(int rowNumber, char* col1, int col2) {
+  char* col2string = calloc(MAX_COUNT_LENGTH, sizeof(char));
+  snprintf(col2string, MAX_COUNT_LENGTH, "%d", col2);
+
+  text_layer_set_text(column1[rowNumber], col1);
+  text_layer_set_text(column2[rowNumber], col2string);
+
+  free(col2string);
 }
 
 static void unload(Window *window) {
