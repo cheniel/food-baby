@@ -50,7 +50,7 @@ static GBitmap *waterIcon;
 
 static BitmapLayer *logIconLayer;
 static GBitmap *logIcon;
-extern servingCount userServings;
+extern ServingCount userServings;
 
 // ---------------- Private prototypes
 static void select_click_handler(ClickRecognizerRef recognizer, void *context);

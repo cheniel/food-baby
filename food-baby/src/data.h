@@ -13,14 +13,14 @@
 // ---------------- Constants
 
 // ---------------- Structures/Types
-typedef struct servingCount {
+typedef struct ServingCount {
 	int water;
 	int grains;
 	int veggies;
 	int fruit;
 	int dairy;
 	int protein;
-} servingCount;
+} ServingCount;
 
 // ---------------- Public Variables
 

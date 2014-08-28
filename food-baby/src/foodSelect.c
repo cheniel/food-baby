@@ -13,6 +13,7 @@
 
 // ---------------- Local includes  e.g., "file.h"
 #include "common.h"
+#include "data.h"
 
 // ---------------- Constant definitions
 char* servingSizeGrains[] = {
@@ -75,6 +76,7 @@ char* servingSizeProteins[] = {
 #define NUM_MENU_ITEMS 5
 #define NUM_SERVING_EXAMPLES 8
 #define MAX_COMPARE_SIZE 10
+#define ANIMATED_SETTING true
 
 // ---------------- Structures/Types
 
@@ -83,11 +85,17 @@ static SimpleMenuLayer *simple_menu_layer;
 static SimpleMenuSection menu_sections[NUM_MENU_SECTIONS];
 static SimpleMenuItem menu_items[NUM_MENU_ITEMS];
 
+extern ServingCount userServings;
+
 // ---------------- Private prototypes
-static void menu_select_callback(int index, void *ctx);
 static char* getServingExample(char* foodGroup);
 static void load(Window *window);
 static void unload(Window *window);
+static void grainSelectCallback(int index, void *ctx);
+static void vegetableSelectCallback(int index, void *ctx);
+static void fruitSelectCallback(int index, void *ctx);
+static void dairySelectCallback(int index, void *ctx);
+static void proteinSelectCallback(int index, void *ctx);
 
 /* ========================================================================== */
 
@@ -101,13 +109,31 @@ Window *foodInit() {
 	return window;
 }
 
-// You can capture when the user selects a menu icon with a menu item select callback
-static void menu_select_callback(int index, void *ctx) {
-  // Here we just change the subtitle to a literal string
-  menu_items[index].subtitle = "You've hit select here!";
-  // Mark the layer to be updated
-  layer_mark_dirty(simple_menu_layer_get_layer(simple_menu_layer));
+static void grainSelectCallback(int index, void *ctx) {
+  userServings.grains++;
+  window_stack_pop(ANIMATED_SETTING);
 }
+
+static void vegetableSelectCallback(int index, void *ctx) {
+  userServings.veggies++;
+  window_stack_pop(ANIMATED_SETTING);
+}
+
+static void fruitSelectCallback(int index, void *ctx) {
+  userServings.fruit++;
+  window_stack_pop(ANIMATED_SETTING);
+}
+
+static void dairySelectCallback(int index, void *ctx) {
+  userServings.dairy++;
+  window_stack_pop(ANIMATED_SETTING);
+}
+
+static void proteinSelectCallback(int index, void *ctx) {
+  userServings.protein++;
+  window_stack_pop(ANIMATED_SETTING);
+}
+
 
 static void load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
@@ -118,19 +144,19 @@ static void load(Window *window) {
   menu_items[num_a_items++] = (SimpleMenuItem){
     .title = "Grains",
     .subtitle = getServingExample("Grains"),
-    .callback = menu_select_callback,
+    .callback = grainSelectCallback,
   };
 
   menu_items[num_a_items++] = (SimpleMenuItem){
     .title = "Vegetables",
     .subtitle = getServingExample("Vegetables"),
-    .callback = menu_select_callback,
+    .callback = vegetableSelectCallback,
   };
 
   menu_items[num_a_items++] = (SimpleMenuItem){
     .title = "Fruits",
     .subtitle = getServingExample("Fruits"),
-    .callback = menu_select_callback,
+    .callback = fruitSelectCallback,
     // This is how you would give a menu item an icon
     // .icon = menu_icon_image,
   };
@@ -138,13 +164,13 @@ static void load(Window *window) {
   menu_items[num_a_items++] = (SimpleMenuItem){
     .title = "Dairy",
     .subtitle = getServingExample("Dairy"),
-    .callback = menu_select_callback,
+    .callback = dairySelectCallback,
   };
 
   menu_items[num_a_items++] = (SimpleMenuItem){
     .title = "Proteins",
     .subtitle = getServingExample("Proteins"),
-    .callback = menu_select_callback,
+    .callback = proteinSelectCallback,
   };
 
   // Bind the menu items to the corresponding menu sections

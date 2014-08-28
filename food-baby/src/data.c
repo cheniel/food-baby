@@ -15,7 +15,7 @@
 #include "data.h"                       
 
 // ---------------- Constant definitions
-const servingCount minRecServings = {
+const ServingCount minRecServings = {
 	.water = 6,
 	.grains = 6,
 	.veggies = 3,
@@ -24,7 +24,7 @@ const servingCount minRecServings = {
 	.protein = 2
 };
 
-const servingCount maxRecServings = {
+const ServingCount maxRecServings = {
 	.water = 8,
 	.grains = 11,
 	.veggies = 5,
@@ -39,7 +39,7 @@ const servingCount maxRecServings = {
 // ---------------- Structures/Types
 
 // ---------------- Private variables
-servingCount userServings;
+ServingCount userServings;
 int activityToday;
 int activityRecord;
 
@@ -49,7 +49,7 @@ int activityRecord;
 /* ========================================================================== */
 
 void initData() {
- 	userServings = (servingCount) {
+ 	userServings = (ServingCount) {
  		.water = 0,
  		.grains = 0,
  		.veggies = 0,

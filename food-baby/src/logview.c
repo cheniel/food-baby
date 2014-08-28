@@ -34,7 +34,7 @@ static TextLayer* column2[NUM_ROWS];
 static char* col2values[NUM_ROWS];
 static TextLayer* foodHeader;
 static TextLayer* activityHeader;
-extern servingCount userServings;
+extern ServingCount userServings;
 extern int activityToday;
 extern int activityRecord;
 
