@@ -157,8 +157,6 @@ static void load(Window *window) {
     .title = "Fruits",
     .subtitle = getServingExample("Fruits"),
     .callback = fruitSelectCallback,
-    // This is how you would give a menu item an icon
-    // .icon = menu_icon_image,
   };
 
   menu_items[num_a_items++] = (SimpleMenuItem){

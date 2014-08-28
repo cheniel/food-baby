@@ -26,6 +26,7 @@ typedef struct ServingCount {
 
 // ---------------- Prototypes/Macros
 void initData();
+void saveData();
 
 /* ========================================================================== */
 
