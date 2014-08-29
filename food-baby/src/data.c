@@ -91,10 +91,13 @@ void resetDailyData() {
  	};
 
  	activityToday = 0;
+
+ 	saveData();
 }
 
 void resetRecord() {
 	activityRecord = 0;
+	saveData();
 }
 
 void saveData() {
@@ -119,4 +122,5 @@ bool isNewDate(char* currentDate) {
 
 void setNewDate(char* newDate) {
 	strncpy(previousDate, newDate, MAX_DATE_CHAR);
+	saveData();
 }

@@ -187,7 +187,7 @@ static void load(Window *window) {
   };
 
   // Bind the menu items to the corresponding menu sections
-  menuSections[0] = (SimpleMenuSection){
+  menuSections[0] = (SimpleMenuSection) {
     .title = "log your servings!",
     .num_items = NUM_FOOD_GROUPS,
     .items = foodGroups,

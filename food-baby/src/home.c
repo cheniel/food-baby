@@ -51,12 +51,20 @@ static BitmapLayer *logIconLayer;
 static GBitmap *logIcon;
 extern ServingCount userServings;
 
+static Layer *window_layer;
+static GRect bounds;
+
 // ---------------- Private prototypes
 static void select_click_handler(ClickRecognizerRef recognizer, void *context);
 static void up_click_handler(ClickRecognizerRef recognizer, void *context);
 static void down_click_handler(ClickRecognizerRef recognizer, void *context);
 static void click_config_provider(void *context);
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed);
+static void addDateAndTime();
+static void makeRecommendation(char* recommendation);
+static void addLayersToWindow();
+static void createSidebar(int x, int y);
+static void createSprite(int x, int y);
 
 static void load(Window *window);
 static void unload(Window *window);
@@ -79,13 +87,7 @@ Window *homeInit() {
     return home;
 }
 
-static void load(Window *window) {
-    Layer *window_layer = window_get_root_layer(window);
-    GRect bounds = layer_get_bounds(window_layer);
-
-    /* initialize services */
-    tick_timer_service_subscribe(MINUTE_UNIT, tick_handler); 
-
+static void addDateAndTime() {
     /* create time text */
     timeString = calloc(MAX_TIME_CHAR, sizeof(char));
     timeText = text_layer_create((GRect) { 
@@ -111,42 +113,68 @@ static void load(Window *window) {
     struct tm* tm = localtime(&currentTime);
     updateTime(tm);
     updateDate(tm);
+}
 
-    /* create recommendation text */
-    recText = text_layer_create((GRect) { 
-        .origin = { 0, 145 }, 
-        .size = { bounds.size.w, 20 } 
-    });
-    setTextLayerDefaults(recText);
-    text_layer_set_font(recText, 
-        fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
-    text_layer_set_text(recText, "drink more water!");
+static void makeRecommendation(char* recommendation) {
+    if (!recText) {
+        /* create recommendation text */
+        recText = text_layer_create((GRect) { 
+            .origin = { 0, 145 }, 
+            .size = { bounds.size.w, 20 } 
+        });
+        setTextLayerDefaults(recText);
+        text_layer_set_font(recText, 
+            fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
+    }
 
+    text_layer_set_text(recText, recommendation);
+}
+
+static void createSidebar(int x, int y) {
     /* create sidebar */
     sidebarImg = gbitmap_create_with_resource(RESOURCE_ID_SIDEBAR);
-    sidebarLayer = bitmap_layer_create(GRect(117, 46, 30, 85));
+    sidebarLayer = bitmap_layer_create(GRect(x, y, 30, 85));
     bitmap_layer_set_bitmap(sidebarLayer, sidebarImg);
 
     /* create food icon */
     foodIcon = gbitmap_create_with_resource(RESOURCE_ID_FOOD);
-    foodIconLayer = bitmap_layer_create(GRect(119, 49, 25, 25));
+    foodIconLayer = bitmap_layer_create(GRect(x + 2, y + 3, 25, 25));
     bitmap_layer_set_bitmap(foodIconLayer, foodIcon);
 
     /* create water icon */
     waterIcon = gbitmap_create_with_resource(RESOURCE_ID_WATER);
-    waterIconLayer = bitmap_layer_create(GRect(119, 76, 25, 25));
+    waterIconLayer = bitmap_layer_create(GRect(x + 2, y + 30, 25, 25));
     bitmap_layer_set_bitmap(waterIconLayer, waterIcon);
 
     /* create log icon */
     logIcon = gbitmap_create_with_resource(RESOURCE_ID_LOG);
-    logIconLayer = bitmap_layer_create(GRect(119, 103, 25, 25));
+    logIconLayer = bitmap_layer_create(GRect(x + 2, y + 57, 25, 25));
     bitmap_layer_set_bitmap(logIconLayer, logIcon);
+}
 
+static void load(Window *window) {
+    window_layer = window_get_root_layer(window);
+    bounds = layer_get_bounds(window_layer);
+
+    /* initialize services */
+    tick_timer_service_subscribe(MINUTE_UNIT, tick_handler); 
+
+    addDateAndTime();
+    makeRecommendation("drink more water!");
+    createSidebar(117, 46);
+    createSprite(10, 90);
+
+    addLayersToWindow();
+}
+
+static void createSprite(int x, int y) {
     /* create sprite */
     spriteImg = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_IDLE);
-    spriteLayer = bitmap_layer_create(GRect(10, 90, 40, 40));
+    spriteLayer = bitmap_layer_create(GRect(x, y, 40, 40));
     bitmap_layer_set_bitmap(spriteLayer, spriteImg);
+}
 
+static void addLayersToWindow() {
     /* add text layers to window */
     layer_add_child(window_layer, text_layer_get_layer(timeText));
     layer_add_child(window_layer, text_layer_get_layer(dateText));
