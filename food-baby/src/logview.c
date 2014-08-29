@@ -117,6 +117,18 @@ static void load(Window *window) {
   addTextLayersToWindow(windowLayer);
 }
 
+static void unload(Window *window) {
+  text_layer_destroy(foodHeader);
+  text_layer_destroy(activityHeader);
+
+  // destroy table
+  for (int row = 0; row < NUM_ROWS; row++) {
+    text_layer_destroy(column1[row]);
+    text_layer_destroy(column2[row]);
+    free(col2values[row]);
+  }
+}
+
 static void addTextLayersToWindow(Layer* windowLayer) {
   // add table to window
   for (int row = 0; row < NUM_ROWS; row++) {
@@ -133,15 +145,5 @@ static void assignRow(int rowNumber, char* col1, int col2) {
   snprintf(col2values[rowNumber], MAX_COUNT_LENGTH, "%d", col2);
   text_layer_set_text(column1[rowNumber], col1);
   text_layer_set_text(column2[rowNumber], col2values[rowNumber]);
-}
-
-static void unload(Window *window) {
-  
-  // destroy table
-  for (int row = 0; row < NUM_ROWS; row++) {
-    text_layer_destroy(column1[row]);
-    text_layer_destroy(column2[row]);
-    free(col2values[row]);
-  }
 }
 

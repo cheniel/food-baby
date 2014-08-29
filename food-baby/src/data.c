@@ -198,16 +198,15 @@ void resetRecord() {
 
 void saveData() {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "saving data");
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_ACT_TODAY, activityToday));
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_ACT_RECORD, activityRecord));
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_WATER, userServings.water));
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_GRAINS, userServings.grains));
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_VEG, userServings.veggies));
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_FRUIT, userServings.fruit));
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_DAIRY, userServings.dairy));
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_PROTEIN, userServings.protein));
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", persist_write_string(PKEY_PREV_DATE, previousDate));
-
+	persist_write_int(PKEY_ACT_TODAY, activityToday);
+	persist_write_int(PKEY_ACT_RECORD, activityRecord);
+	persist_write_int(PKEY_WATER, userServings.water);
+	persist_write_int(PKEY_GRAINS, userServings.grains);
+	persist_write_int(PKEY_VEG, userServings.veggies);
+	persist_write_int(PKEY_FRUIT, userServings.fruit);
+	persist_write_int(PKEY_DAIRY, userServings.dairy);
+	persist_write_int(PKEY_PROTEIN, userServings.protein);
+	persist_write_string(PKEY_PREV_DATE, previousDate);
 }
 
 void freeResources() {
