@@ -13,6 +13,7 @@
 
 // ---------------- Local includes  e.g., "file.h"
 #include "data.h"                       
+#include "common.h"
 
 // ---------------- Constant definitions
 const ServingCount minRecServings = {
@@ -44,6 +45,7 @@ const ServingCount maxRecServings = {
 #define PKEY_FRUIT 5
 #define PKEY_DAIRY 6
 #define PKEY_PROTEIN 7
+#define PKEY_PREV_DATE 8
 
 // ---------------- Structures/Types
 
@@ -51,6 +53,7 @@ const ServingCount maxRecServings = {
 ServingCount userServings;
 int activityToday;
 int activityRecord;
+char *previousDate;
 
 // ---------------- Private prototypes
 
@@ -71,6 +74,10 @@ void initData() {
  					persist_read_int(PKEY_ACT_TODAY):0;
  	activityRecord = persist_exists(PKEY_ACT_RECORD)?
  					persist_read_int(PKEY_ACT_RECORD):activityToday;
+
+ 	previousDate = calloc(MAX_DATE_CHAR, sizeof(char));
+ 	persist_read_string(PKEY_PREV_DATE, previousDate, MAX_DATE_CHAR);
+
 }
 
 void resetDailyData() {
@@ -99,5 +106,17 @@ void saveData() {
 	persist_write_int(PKEY_FRUIT, userServings.fruit);
 	persist_write_int(PKEY_DAIRY, userServings.dairy);
 	persist_write_int(PKEY_PROTEIN, userServings.protein);
+	persist_write_string(PKEY_PREV_DATE, previousDate);
 }
 
+void freeResources() {
+	free(previousDate);
+}
+
+bool isNewDate(char* currentDate) {
+	return !strncmp(currentDate, previousDate, MAX_DATE_CHAR);
+}
+
+void setNewDate(char* newDate) {
+	strncpy(previousDate, newDate, MAX_DATE_CHAR);
+}

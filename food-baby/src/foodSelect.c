@@ -73,7 +73,7 @@ char* servingSizeProteins[] = {
 
 // ---------------- Macro definitions
 #define NUM_MENU_SECTIONS 1
-#define NUM_MENU_ITEMS 5
+#define NUM_FOOD_GROUPS 5
 #define NUM_SERVING_EXAMPLES 8
 #define MAX_COMPARE_SIZE 10
 #define ANIMATED_SETTING true
@@ -83,7 +83,7 @@ char* servingSizeProteins[] = {
 // ---------------- Private variables
 static SimpleMenuLayer *simple_menu_layer;
 static SimpleMenuSection menu_sections[NUM_MENU_SECTIONS];
-static SimpleMenuItem menu_items[NUM_MENU_ITEMS];
+static SimpleMenuItem FOOD_GROUPS[NUM_FOOD_GROUPS];
 
 extern ServingCount userServings;
 
@@ -141,31 +141,31 @@ static void load(Window *window) {
 
   int num_a_items = 0;
 
-  menu_items[num_a_items++] = (SimpleMenuItem){
+  FOOD_GROUPS[num_a_items++] = (SimpleMenuItem){
     .title = "grains",
     .subtitle = getServingExample("grains"),
     .callback = grainSelectCallback,
   };
 
-  menu_items[num_a_items++] = (SimpleMenuItem){
+  FOOD_GROUPS[num_a_items++] = (SimpleMenuItem){
     .title = "vegetables",
     .subtitle = getServingExample("vegetables"),
     .callback = vegetableSelectCallback,
   };
 
-  menu_items[num_a_items++] = (SimpleMenuItem){
+  FOOD_GROUPS[num_a_items++] = (SimpleMenuItem){
     .title = "fruits",
     .subtitle = getServingExample("fruits"),
     .callback = fruitSelectCallback,
   };
 
-  menu_items[num_a_items++] = (SimpleMenuItem){
+  FOOD_GROUPS[num_a_items++] = (SimpleMenuItem){
     .title = "dairy",
     .subtitle = getServingExample("dairy"),
     .callback = dairySelectCallback,
   };
 
-  menu_items[num_a_items++] = (SimpleMenuItem){
+  FOOD_GROUPS[num_a_items++] = (SimpleMenuItem){
     .title = "proteins",
     .subtitle = getServingExample("proteins"),
     .callback = proteinSelectCallback,
@@ -174,8 +174,8 @@ static void load(Window *window) {
   // Bind the menu items to the corresponding menu sections
   menu_sections[0] = (SimpleMenuSection){
     .title = "log your servings!",
-    .num_items = NUM_MENU_ITEMS,
-    .items = menu_items,
+    .num_items = NUM_FOOD_GROUPS,
+    .items = FOOD_GROUPS,
   };
 
   // Initialize the simple menu layer

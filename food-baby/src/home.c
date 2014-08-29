@@ -23,8 +23,6 @@
 // static const int = 5
 
 // ---------------- Macro definitions
-#define MAX_TIME_CHAR 10
-#define MAX_DATE_CHAR 30
 #define TIME_FORMAT "%I:%M"
 #define DATE_FORMAT "%a, %b %e"
 
@@ -232,5 +230,10 @@ static void updateDate(struct tm *tick_time) {
       dateString[i] = tolower((unsigned char) dateString[i]);
     }
     text_layer_set_text(dateText, dateString);    
+
+    if (isNewDate(dateString)) {
+        setNewDate(dateString);
+        resetDailyData();
+    }
 }
 

@@ -69,6 +69,7 @@ static void init(void) {
 
 static void deinit(void) {
     saveData();
+    freeResources();
     window_destroy(home);
     window_destroy(foodSelect);
     window_destroy(logview);

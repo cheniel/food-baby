@@ -29,6 +29,9 @@ void initData();
 void saveData();
 void resetDailyData();
 void resetRecord();
+void freeResources();
+bool isNewDate(char* currentDate);
+void setNewDate(char* newDate);
 
 /* ========================================================================== */
 

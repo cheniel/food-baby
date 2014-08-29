@@ -14,6 +14,9 @@
 #define BACKGROUND_COLOR GColorBlack
 #define FONT_COLOR GColorWhite
 
+#define MAX_TIME_CHAR 10
+#define MAX_DATE_CHAR 30
+
 // ---------------- Structures/Types
 
 // ---------------- Public Variables
