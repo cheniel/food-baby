@@ -15,6 +15,8 @@
 // app occasionally crashes when writing data at end
     // http://forums.getpebble.com/discussion/12390/persistent-storage-failing-after-many-writes
     // http://forums.getpebble.com/discussion/14181/persist-write-data-crashing-application
+    // could be isolated to when logging is enabled, as it slows down application.
+    // might be a good idea to save whole structure anyways to shorten save time.
 // not all memory gets freed
 
 // ---------------- System includes e.g., <stdio.h>

@@ -88,6 +88,8 @@ void initData() {
 }
 
 Foods getRecommendation() {
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "getting recommendation");
+
 	double pwater;
 	double pgrains;
 	double pveggies;
@@ -120,34 +122,48 @@ Foods getRecommendation() {
 
 		if (!allSatisfied) {
 
-			double lowestP = -1.0;
+			double lowestP = 1000.0;
 
-			if (pwater > lowestP) {
+			if (pwater < lowestP) {
 				recommendedFood = water;
 				lowestP = pwater;
+				APP_LOG(APP_LOG_LEVEL_DEBUG, "lowest set at pwater at %d", (int) pwater * 100);
 
-			} else if (pgrains > lowestP) {
+			} 
+
+			if (pgrains < lowestP) {
 				recommendedFood = grains;
 				lowestP = pgrains;
+				APP_LOG(APP_LOG_LEVEL_DEBUG, "lowest set at pgrains at %d", (int) pgrains * 100);
 
-			} else if (pveggies > lowestP) {
+			} 
+
+			if (pveggies < lowestP) {
 				recommendedFood = veggies;
 				lowestP = pveggies;
+				APP_LOG(APP_LOG_LEVEL_DEBUG, "lowest set at pveggies at %d", (int) pveggies * 100);
 
-			} else if (pfruit > lowestP) {
+			} 
+
+			if (pfruit < lowestP) {
 				recommendedFood = fruit;
 				lowestP = pfruit;
+				APP_LOG(APP_LOG_LEVEL_DEBUG, "lowest set at pfruit at %d", (int) pfruit * 100);
 
-			} else if (pdairy > lowestP) {
+			} 
+
+			if (pdairy < lowestP) {
 				recommendedFood = dairy;
 				lowestP = pdairy;
+				APP_LOG(APP_LOG_LEVEL_DEBUG, "lowest set at pdairy at %d", (int) pdairy * 100);
 
-			} else if (pprotein > lowestP) {
+			} 
+
+			if (pprotein < lowestP) {
 				recommendedFood = protein;
 				lowestP = pprotein;
-			} else {
-				recommendedFood = none;
-			}
+				APP_LOG(APP_LOG_LEVEL_DEBUG, "lowest set at pprotein at %d", (int) pprotein * 100);
+			} 
 
 			return recommendedFood;
 
