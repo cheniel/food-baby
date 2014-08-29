@@ -10,6 +10,9 @@
 /* ========================================================================== */
 
 // ---------------- Open Issues
+// data does not reset on date change
+// data resets on application close
+// should be a persistent data issue
 
 // ---------------- System includes e.g., <stdio.h>
 #include <pebble.h>
@@ -123,7 +126,9 @@ static void load(Window *window) {
     tick_timer_service_subscribe(SECOND_UNIT, tick_handler); 
 
     addDateAndTime();
-    makeRecommendation("Drink more water!");
+
+    Foods recommendedFood = getRecommendation();
+    makeRecommendation(getRecommendationForFood(recommendedFood));
     createSprite(SPRITE_STARTX, SPRITE_STARTY);
     createSidebar(SIDEBAR_XPOS, SIDEBAR_YPOS);
 
