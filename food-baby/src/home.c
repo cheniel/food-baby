@@ -20,8 +20,6 @@
     // could be isolated to when logging is enabled, as it slows down application.
     // might be a good idea to save whole structure anyways to shorten save time.
 
-// not all memory gets freed
-
 // ---------------- System includes e.g., <stdio.h>
 #include <pebble.h>
 #include <ctype.h>

@@ -23,6 +23,7 @@
 Window *home;
 Window *foodSelect;
 Window *logview;
+static unsigned long next = 1;
 
 // ---------------- Private prototypes
 
