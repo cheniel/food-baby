@@ -127,42 +127,31 @@ Foods getRecommendation() {
 			if (pwater < lowestP) {
 				recommendedFood = water;
 				lowestP = pwater;
-				APP_LOG(APP_LOG_LEVEL_DEBUG, "lowest set at pwater at %d", (int) pwater * 100);
-
 			} 
 
 			if (pgrains < lowestP) {
 				recommendedFood = grains;
 				lowestP = pgrains;
-				APP_LOG(APP_LOG_LEVEL_DEBUG, "lowest set at pgrains at %d", (int) pgrains * 100);
-
 			} 
 
 			if (pveggies < lowestP) {
 				recommendedFood = veggies;
 				lowestP = pveggies;
-				APP_LOG(APP_LOG_LEVEL_DEBUG, "lowest set at pveggies at %d", (int) pveggies * 100);
-
 			} 
 
 			if (pfruit < lowestP) {
 				recommendedFood = fruit;
 				lowestP = pfruit;
-				APP_LOG(APP_LOG_LEVEL_DEBUG, "lowest set at pfruit at %d", (int) pfruit * 100);
-
 			} 
 
 			if (pdairy < lowestP) {
 				recommendedFood = dairy;
 				lowestP = pdairy;
-				APP_LOG(APP_LOG_LEVEL_DEBUG, "lowest set at pdairy at %d", (int) pdairy * 100);
-
 			} 
 
 			if (pprotein < lowestP) {
 				recommendedFood = protein;
 				lowestP = pprotein;
-				APP_LOG(APP_LOG_LEVEL_DEBUG, "lowest set at pprotein at %d", (int) pprotein * 100);
 			} 
 
 			return recommendedFood;
@@ -193,7 +182,7 @@ void resetDailyData() {
 
 void resetRecord() {
 	activityRecord = 0;
-	saveData();
+	persist_write_int(PKEY_ACT_RECORD, activityRecord);
 }
 
 void saveData() {
@@ -219,5 +208,5 @@ bool isNewDate(char* currentDate) {
 
 void setNewDate(char* newDate) {
 	strncpy(previousDate, newDate, MAX_DATE_CHAR);
-	saveData();
+	persist_write_string(PKEY_PREV_DATE, previousDate);
 }

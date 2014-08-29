@@ -15,6 +15,7 @@
 #include "common.h"
 #include "data.h"
 #include "servingSizeExamples.h"
+#include "home.h"
 
 // ---------------- Constant definitions
 
@@ -45,6 +46,8 @@ static void vegetableSelectCallback(int index, void *ctx);
 static void fruitSelectCallback(int index, void *ctx);
 static void dairySelectCallback(int index, void *ctx);
 static void proteinSelectCallback(int index, void *ctx);
+static void resetDailyCallback(int index, void *ctx);
+static void resetRecordCallback(int index, void *ctx);
 
 /* ========================================================================== */
 
@@ -60,26 +63,43 @@ Window *foodInit() {
 
 static void grainSelectCallback(int index, void *ctx) {
   userServings.grains++;
+  makeRecommendation();
   window_stack_pop(ANIMATED_SETTING);
 }
 
 static void vegetableSelectCallback(int index, void *ctx) {
   userServings.veggies++;
+  makeRecommendation();
   window_stack_pop(ANIMATED_SETTING);
 }
 
 static void fruitSelectCallback(int index, void *ctx) {
   userServings.fruit++;
+  makeRecommendation();
   window_stack_pop(ANIMATED_SETTING);
 }
 
 static void dairySelectCallback(int index, void *ctx) {
   userServings.dairy++;
+  makeRecommendation();
   window_stack_pop(ANIMATED_SETTING);
 }
 
 static void proteinSelectCallback(int index, void *ctx) {
   userServings.protein++;
+  makeRecommendation();
+  window_stack_pop(ANIMATED_SETTING);
+}
+
+static void resetDailyCallback(int index, void *ctx) {
+  resetDailyData();
+  makeRecommendation();
+  window_stack_pop(ANIMATED_SETTING);
+}
+
+static void resetRecordCallback(int index, void *ctx) {
+  resetRecord();
+  makeRecommendation();
   window_stack_pop(ANIMATED_SETTING);
 }
 
@@ -124,13 +144,13 @@ static void load(Window *window) {
   settings[menuItem++] = (SimpleMenuItem) {
     .title = "reset daily data",
     .subtitle = "eating and activity data",
-    .callback = resetDailyData,
+    .callback = resetDailyCallback,
   };
 
   settings[menuItem++] = (SimpleMenuItem) {
     .title = "reset record",
     .subtitle = "activity record",
-    .callback = resetRecord,
+    .callback = resetRecordCallback,
   };
 
   // Bind the menu items to the corresponding menu sections

@@ -11,12 +11,15 @@
 
 // ---------------- Open Issues
 // data does not reset on date change
-// should be a persistent data issue
+    // should be a persistent data issue
+    // potentially resolved
+
 // app occasionally crashes when writing data at end
     // http://forums.getpebble.com/discussion/12390/persistent-storage-failing-after-many-writes
     // http://forums.getpebble.com/discussion/14181/persist-write-data-crashing-application
     // could be isolated to when logging is enabled, as it slows down application.
     // might be a good idea to save whole structure anyways to shorten save time.
+
 // not all memory gets freed
 
 // ---------------- System includes e.g., <stdio.h>
@@ -26,6 +29,7 @@
 // ---------------- Local includes  e.g., "file.h"
 #include "common.h"
 #include "data.h"
+#include "home.h"
 
 // ---------------- Constant definitions
 
@@ -88,8 +92,6 @@ extern ServingCount userServings;
 static Layer *window_layer;
 static GRect bounds;
 
-extern char* previousDate;
-
 // ---------------- Private prototypes
 static void select_click_handler(ClickRecognizerRef recognizer, void *context);
 static void up_click_handler(ClickRecognizerRef recognizer, void *context);
@@ -97,7 +99,6 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context);
 static void click_config_provider(void *context);
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed);
 static void addDateAndTime();
-static void makeRecommendation(char* recommendation);
 static void addLayersToWindow();
 static void showSidebar();
 static void createSprite(int x, int y);
@@ -135,8 +136,7 @@ static void load(Window *window) {
 
     addDateAndTime();
 
-    Foods recommendedFood = getRecommendation();
-    makeRecommendation(getRecommendationForFood(recommendedFood));
+    makeRecommendation();
     createSprite(SPRITE_STARTX, SPRITE_STARTY);
     createSidebar(SIDEBAR_XPOS, SIDEBAR_YPOS);
 
@@ -199,7 +199,9 @@ static void addDateAndTime() {
     updateDate(tm);
 }
 
-static void makeRecommendation(char* recommendation) {
+void makeRecommendation() {
+    Foods recommendedFood = getRecommendation();
+
     if (!recText) {
         /* create recommendation text */
         recText = text_layer_create((GRect) { 
@@ -211,7 +213,7 @@ static void makeRecommendation(char* recommendation) {
             fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
     }
 
-    text_layer_set_text(recText, recommendation);
+    text_layer_set_text(recText, getRecommendationForFood(recommendedFood));
 }
 
 static void createSidebar(int x, int y) {
@@ -290,6 +292,8 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
     if (sidebarVisible) { userServings.water++; }// increment water count
     else { showSidebar(); } // or show sidebar
+
+    makeRecommendation();
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) { 

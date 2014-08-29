@@ -17,5 +17,6 @@
 
 // ---------------- Prototypes/Macros
 Window *homeInit();
+void makeRecommendation();
 
 #endif // HOME_H
