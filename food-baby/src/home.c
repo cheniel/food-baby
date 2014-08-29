@@ -11,8 +11,9 @@
 
 // ---------------- Open Issues
 // data does not reset on date change
-// data resets on application close
 // should be a persistent data issue
+// app occasionally crashes when writing data at end
+// not all memory gets freed
 
 // ---------------- System includes e.g., <stdio.h>
 #include <pebble.h>
@@ -77,10 +78,13 @@ static GBitmap *waterIcon;
 
 static BitmapLayer *logIconLayer;
 static GBitmap *logIcon;
+
 extern ServingCount userServings;
 
 static Layer *window_layer;
 static GRect bounds;
+
+extern char* previousDate;
 
 // ---------------- Private prototypes
 static void select_click_handler(ClickRecognizerRef recognizer, void *context);
@@ -136,6 +140,31 @@ static void load(Window *window) {
     sidebarVisible = false;
 
     addLayersToWindow();
+}
+
+static void unload(Window *window) {
+    text_layer_destroy(timeText);
+    text_layer_destroy(dateText);
+    text_layer_destroy(recText);
+    free(timeString);
+    free(dateString);
+
+    bitmap_layer_destroy(sidebarLayer);
+    gbitmap_destroy(sidebarImg);
+
+    bitmap_layer_destroy(foodIconLayer);
+    gbitmap_destroy(foodIcon);
+
+    bitmap_layer_destroy(waterIconLayer);
+    gbitmap_destroy(waterIcon);  
+    
+    bitmap_layer_destroy(logIconLayer);
+    gbitmap_destroy(logIcon);  
+
+    bitmap_layer_destroy(spriteLayer);
+    gbitmap_destroy(spriteImg);
+
+    tick_timer_service_unsubscribe();
 }
 
 static void addDateAndTime() {
@@ -228,30 +257,6 @@ static void addLayersToWindow() {
     layer_add_child(window_layer, bitmap_layer_get_layer(spriteLayer));
 }
 
-static void unload(Window *window) {
-    text_layer_destroy(timeText);
-    text_layer_destroy(dateText);
-    free(timeString);
-    free(dateString);
-
-    bitmap_layer_destroy(sidebarLayer);
-    gbitmap_destroy(sidebarImg);
-
-    bitmap_layer_destroy(foodIconLayer);
-    gbitmap_destroy(foodIcon);
-
-    bitmap_layer_destroy(waterIconLayer);
-    gbitmap_destroy(waterIcon);  
-    
-    bitmap_layer_destroy(logIconLayer);
-    gbitmap_destroy(logIcon);  
-
-    bitmap_layer_destroy(spriteLayer);
-    gbitmap_destroy(spriteImg);
-
-    tick_timer_service_unsubscribe();
-}
-
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
     if (units_changed & SECOND_UNIT) { secondHandler(tick_time); }
     if (units_changed & MINUTE_UNIT) { updateTime(tick_time); }
@@ -259,6 +264,8 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void secondHandler(struct tm *tick_time) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "previousDate: %s", previousDate);
+
     if (sidebarVisible) {
         secondsSinceLastAction++;
         if (secondsSinceLastAction > SIDEBAR_DISPLAY_TIME) { hideSidebar(); }
@@ -311,6 +318,7 @@ static void updateTime(struct tm *tick_time) {
 }
 
 static void updateDate(struct tm *tick_time) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "updating date");
     strftime(dateString, MAX_DATE_CHAR, DATE_FORMAT, tick_time);
     for(int i = 0; dateString[i]; i++){
       dateString[i] = tolower((unsigned char) dateString[i]);
@@ -318,8 +326,10 @@ static void updateDate(struct tm *tick_time) {
     text_layer_set_text(dateText, dateString);    
 
     if (isNewDate(dateString)) {
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "entered conditional");
         setNewDate(dateString);
         resetDailyData();
+        saveData();
     }
 }
 

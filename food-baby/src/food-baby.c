@@ -55,11 +55,10 @@ static void tapHandler(AccelAxisType axis, int32_t direction) {
 }
 
 static void init(void) {
+    initData();
     home = homeInit();
     foodSelect = foodInit();
     logview = logInit();
-
-    initData();
 
     accel_tap_service_subscribe(tapHandler);
 

@@ -36,15 +36,15 @@ const ServingCount maxRecServings = {
 // ---------------- Macro definitions
 
 // keys for persistant storage
-#define PKEY_ACT_TODAY 0
-#define PKEY_ACT_RECORD 1
-#define PKEY_WATER 2
-#define PKEY_GRAINS 3
-#define PKEY_VEG 4
-#define PKEY_FRUIT 5
-#define PKEY_DAIRY 6
-#define PKEY_PROTEIN 7
-#define PKEY_PREV_DATE 8
+#define PKEY_ACT_TODAY 1100424242
+#define PKEY_ACT_RECORD 1101424242
+#define PKEY_WATER 1102424242
+#define PKEY_GRAINS 1103424242
+#define PKEY_VEG 1104424242
+#define PKEY_FRUIT 1105424242
+#define PKEY_DAIRY 1106424242
+#define PKEY_PROTEIN 1107424242
+#define PKEY_PREV_DATE 1108424242
 
 // ---------------- Structures/Types
 
@@ -76,8 +76,15 @@ void initData() {
  					persist_read_int(PKEY_ACT_RECORD):activityToday;
 
  	previousDate = calloc(MAX_DATE_CHAR, sizeof(char));
- 	persist_read_string(PKEY_PREV_DATE, previousDate, MAX_DATE_CHAR);
+ 	if (!persist_exists(PKEY_PREV_DATE)) {
+ 		APP_LOG(APP_LOG_LEVEL_DEBUG, "No previousDate found.");
+ 		strncpy(previousDate, "unset", MAX_DATE_CHAR);
+ 		persist_write_string(PKEY_PREV_DATE, previousDate);
+ 	} else {
+ 		persist_read_string(PKEY_PREV_DATE, previousDate, MAX_DATE_CHAR);
+ 	}
 
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "previousDate is %s", previousDate);
 }
 
 Foods getRecommendation() {
@@ -153,6 +160,7 @@ Foods getRecommendation() {
 }
 
 void resetDailyData() {
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "reset data called");
  	userServings = (ServingCount) {
  		.water = 0,
  		.grains = 0,
@@ -173,15 +181,17 @@ void resetRecord() {
 }
 
 void saveData() {
-	persist_write_int(PKEY_ACT_TODAY, activityToday);
-	persist_write_int(PKEY_ACT_RECORD, activityRecord);
-	persist_write_int(PKEY_WATER, userServings.water);
-	persist_write_int(PKEY_GRAINS, userServings.grains);
-	persist_write_int(PKEY_VEG, userServings.veggies);
-	persist_write_int(PKEY_FRUIT, userServings.fruit);
-	persist_write_int(PKEY_DAIRY, userServings.dairy);
-	persist_write_int(PKEY_PROTEIN, userServings.protein);
-	persist_write_string(PKEY_PREV_DATE, previousDate);
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "saving data");
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_ACT_TODAY, activityToday));
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_ACT_RECORD, activityRecord));
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_WATER, userServings.water));
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_GRAINS, userServings.grains));
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_VEG, userServings.veggies));
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_FRUIT, userServings.fruit));
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_DAIRY, userServings.dairy));
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", (int) persist_write_int(PKEY_PROTEIN, userServings.protein));
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "result %d", persist_write_string(PKEY_PREV_DATE, previousDate));
+
 }
 
 void freeResources() {
@@ -189,7 +199,7 @@ void freeResources() {
 }
 
 bool isNewDate(char* currentDate) {
-	return !strncmp(currentDate, previousDate, MAX_DATE_CHAR);
+	return strncmp(currentDate, previousDate, MAX_DATE_CHAR);
 }
 
 void setNewDate(char* newDate) {
