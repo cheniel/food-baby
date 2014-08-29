@@ -13,6 +13,8 @@
 // data does not reset on date change
 // should be a persistent data issue
 // app occasionally crashes when writing data at end
+    // http://forums.getpebble.com/discussion/12390/persistent-storage-failing-after-many-writes
+    // http://forums.getpebble.com/discussion/14181/persist-write-data-crashing-application
 // not all memory gets freed
 
 // ---------------- System includes e.g., <stdio.h>
@@ -264,8 +266,6 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void secondHandler(struct tm *tick_time) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "previousDate: %s", previousDate);
-
     if (sidebarVisible) {
         secondsSinceLastAction++;
         if (secondsSinceLastAction > SIDEBAR_DISPLAY_TIME) { hideSidebar(); }
