@@ -22,6 +22,16 @@ typedef struct ServingCount {
 	int protein;
 } ServingCount;
 
+typedef enum Foods {
+	water,
+	grains,
+	veggies,
+	fruit,
+	dairy,
+	protein,
+	none,
+} Foods;
+
 // ---------------- Public Variables
 
 // ---------------- Prototypes/Macros
@@ -32,7 +42,7 @@ void resetRecord();
 void freeResources();
 bool isNewDate(char* currentDate);
 void setNewDate(char* newDate);
-char* getRecommendation();
+Foods getRecommendation();
 
 /* ========================================================================== */
 

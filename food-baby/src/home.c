@@ -123,7 +123,7 @@ static void load(Window *window) {
     tick_timer_service_subscribe(SECOND_UNIT, tick_handler); 
 
     addDateAndTime();
-    makeRecommendation(getRecommendation());
+    makeRecommendation("Drink more water!");
     createSprite(SPRITE_STARTX, SPRITE_STARTY);
     createSidebar(SIDEBAR_XPOS, SIDEBAR_YPOS);
 

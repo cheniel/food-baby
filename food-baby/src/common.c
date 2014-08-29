@@ -42,6 +42,8 @@ void setTextLayerDefaults(TextLayer *textlayer) {
   text_layer_set_text_alignment(textlayer, GTextAlignmentCenter);
 }
 
+
+
 // CREDIT:
 // thanks Ryan Reich
 // http://stackoverflow.com/questions/2509679/how-to-generate-a-random-number-
