@@ -13,7 +13,6 @@
 
 // ---------------- Local includes  e.g., "file.h"
 #include "data.h"                       
-#include "common.h"
 
 // ---------------- Constant definitions
 const ServingCount minRecServings = {

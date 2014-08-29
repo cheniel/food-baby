@@ -21,6 +21,15 @@
 #define PEBBLE_HEIGHT 168
 
 // ---------------- Structures/Types
+typedef enum Foods {
+	water,
+	grains,
+	veggies,
+	fruit,
+	dairy,
+	protein,
+	none,
+} Foods;
 
 // ---------------- Public Variables
 
@@ -28,6 +37,7 @@
 void goToLog();
 void goToFoodSelect();
 void setTextLayerDefaults(TextLayer *textlayer);
+char* getRecommendationForFood(Foods food);
 int randomInRange(unsigned int min, unsigned int max);
 
 #endif // COMMON_H

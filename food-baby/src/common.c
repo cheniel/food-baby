@@ -42,7 +42,34 @@ void setTextLayerDefaults(TextLayer *textlayer) {
   text_layer_set_text_alignment(textlayer, GTextAlignmentCenter);
 }
 
-
+char* getRecommendationForFood(Foods food) {
+  switch (food) {
+    case water:
+      return "drink more water!";
+      break;
+    case grains:
+      return "have some grains";
+      break;
+    case veggies:
+      return "eat your veggies!";
+      break;
+    case fruit:
+      return "try some fruit";
+      break;
+    case dairy:
+      return "have some dairy";
+      break;
+    case protein:
+      return "make sure to get protein";
+      break;
+    case none:
+      return "good job!";
+      break;
+    default:
+      return "no food given";
+      break;
+  }
+}
 
 // CREDIT:
 // thanks Ryan Reich

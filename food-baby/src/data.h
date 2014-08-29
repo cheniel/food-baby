@@ -9,7 +9,8 @@
 #define DATA_H
 
 // ---------------- Prerequisites e.g., Requires "math.h"
-
+#include "common.h"
+ 
 // ---------------- Constants
 
 // ---------------- Structures/Types
@@ -21,16 +22,6 @@ typedef struct ServingCount {
 	int dairy;
 	int protein;
 } ServingCount;
-
-typedef enum Foods {
-	water,
-	grains,
-	veggies,
-	fruit,
-	dairy,
-	protein,
-	none,
-} Foods;
 
 // ---------------- Public Variables
 
