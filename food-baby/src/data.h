@@ -32,6 +32,7 @@ void resetRecord();
 void freeResources();
 bool isNewDate(char* currentDate);
 void setNewDate(char* newDate);
+char* getRecommendation();
 
 /* ========================================================================== */
 

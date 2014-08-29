@@ -80,6 +80,12 @@ void initData() {
 
 }
 
+char* getRecommendation() {
+
+
+	return "Drink more water!";
+}
+
 void resetDailyData() {
  	userServings = (ServingCount) {
  		.water = 0,

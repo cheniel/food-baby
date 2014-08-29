@@ -1,11 +1,10 @@
 /* ========================================================================== */
 /* 
- * home.c
+ * sprite.c
  *
  * Project Name: Food Baby
  * Author: cheniel
  *
- * Home window initialization, operations, handlers.
  */
 /* ========================================================================== */
 
@@ -13,36 +12,19 @@
 
 // ---------------- System includes e.g., <stdio.h>
 #include <pebble.h>
-#include <ctype.h>
 
 // ---------------- Local includes  e.g., "file.h"
 #include "common.h"
-#include "data.h"
 
 // ---------------- Constant definitions
 
 // ---------------- Macro definitions
-#define TIME_FORMAT "%I:%M"
-#define DATE_FORMAT "%a, %b %e"
-#define SIDEBAR_DISPLAY_TIME 2
-#define SIDEBAR_XPOS 117
-#define SIDEBAR_YPOS 55
-
-#define RECOMMENDATION_XPOS 0
-#define RECOMMENDATION_YPOS 145
-
 #define SPRITE_WIDTH 50
 #define SPRITE_HEIGHT 50
 #define SPRITE_STARTX PEBBLE_WIDTH / 2 - SPRITE_WIDTH / 2
 #define SPRITE_STARTY RECOMMENDATION_YPOS - SPRITE_HEIGHT - 5
 #define SPRITE_XMIN 0
 #define SPRITE_XMAX PEBBLE_WIDTH - SPRITE_WIDTH
-
-#define DATE_XPOS 0 
-#define DATE_YPOS 35
-
-#define TIME_XPOS 0
-#define TIME_YPOS 0
 
 // ---------------- Structures/Types
 enum SpriteStates {

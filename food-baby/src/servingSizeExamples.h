@@ -1,6 +1,6 @@
 /* ========================================================================== */
 /* 
- *
+ * servingSizeExamples.h
  *
  *
  */
@@ -8,9 +8,6 @@
 #ifndef SERVINGSIZE_H
 #define SERVINGSIZE_H
 
-// ---------------- Prerequisites e.g., Requires "math.h"
-
-// ---------------- Constants
 char* servingSizeGrains[] = {
   "e.g. a slice of bread",
   "e.g. 1/2 cup of rice",
@@ -65,14 +62,5 @@ char* servingSizeProteins[] = {
   "e.g. 3 oz of turkey",
   "e.g. 1 oz of nuts"
 };
-
-// ---------------- Structures/Types
-
-// ---------------- Public Variables
-
-// ---------------- Prototypes/Macros
-
-
-/* ========================================================================== */
 
 #endif // SERVINGSIZE_H
