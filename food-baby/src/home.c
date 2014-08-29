@@ -25,6 +25,9 @@
 // ---------------- Macro definitions
 #define TIME_FORMAT "%I:%M"
 #define DATE_FORMAT "%a, %b %e"
+#define SIDEBAR_DISPLAY_TIME 2
+#define SIDEBAR_XPOS 117
+#define SIDEBAR_YPOS 46
 
 // ---------------- Structures/Types
 
@@ -34,6 +37,8 @@ static TextLayer *dateText;
 static TextLayer *recText;
 static char *timeString;
 static char *dateString;
+static int secondsSinceLastAction;
+static bool sidebarVisible;
 
 static BitmapLayer *sidebarLayer;
 static GBitmap *sidebarImg;
@@ -63,13 +68,16 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed);
 static void addDateAndTime();
 static void makeRecommendation(char* recommendation);
 static void addLayersToWindow();
-static void createSidebar(int x, int y);
+static void showSidebar();
 static void createSprite(int x, int y);
+static void hideSidebar();
+static void createSidebar(int x, int y);
 
 static void load(Window *window);
 static void unload(Window *window);
-static void updateTime();
+static void updateTime(struct tm *tick_time);
 static void updateDate(struct tm *tick_time);
+static void secondHandler(struct tm *tick_time);
 
 /* ========================================================================== */
 
@@ -152,17 +160,30 @@ static void createSidebar(int x, int y) {
     bitmap_layer_set_bitmap(logIconLayer, logIcon);
 }
 
+static void showSidebar() {
+    layer_add_child(window_layer, bitmap_layer_get_layer(sidebarLayer));
+    layer_add_child(window_layer, bitmap_layer_get_layer(foodIconLayer));
+    layer_add_child(window_layer, bitmap_layer_get_layer(waterIconLayer));
+    layer_add_child(window_layer, bitmap_layer_get_layer(logIconLayer));    
+
+    secondsSinceLastAction = 0;
+    sidebarVisible = true;
+}
+
 static void load(Window *window) {
     window_layer = window_get_root_layer(window);
     bounds = layer_get_bounds(window_layer);
 
     /* initialize services */
-    tick_timer_service_subscribe(MINUTE_UNIT, tick_handler); 
+    tick_timer_service_subscribe(SECOND_UNIT, tick_handler); 
 
     addDateAndTime();
     makeRecommendation("drink more water!");
-    createSidebar(117, 46);
     createSprite(10, 90);
+    createSidebar(SIDEBAR_XPOS, SIDEBAR_YPOS);
+
+    secondsSinceLastAction = 0;
+    sidebarVisible = false;
 
     addLayersToWindow();
 }
@@ -179,11 +200,7 @@ static void addLayersToWindow() {
     layer_add_child(window_layer, text_layer_get_layer(timeText));
     layer_add_child(window_layer, text_layer_get_layer(dateText));
     layer_add_child(window_layer, text_layer_get_layer(recText));
-    layer_add_child(window_layer, bitmap_layer_get_layer(sidebarLayer));
     layer_add_child(window_layer, bitmap_layer_get_layer(spriteLayer));
-    layer_add_child(window_layer, bitmap_layer_get_layer(foodIconLayer));
-    layer_add_child(window_layer, bitmap_layer_get_layer(waterIconLayer));
-    layer_add_child(window_layer, bitmap_layer_get_layer(logIconLayer));
 }
 
 static void unload(Window *window) {
@@ -195,35 +212,55 @@ static void unload(Window *window) {
     bitmap_layer_destroy(sidebarLayer);
     gbitmap_destroy(sidebarImg);
 
-    bitmap_layer_destroy(spriteLayer);
-    gbitmap_destroy(spriteImg);
-
     bitmap_layer_destroy(foodIconLayer);
     gbitmap_destroy(foodIcon);
+
+    bitmap_layer_destroy(waterIconLayer);
+    gbitmap_destroy(waterIcon);  
+    
+    bitmap_layer_destroy(logIconLayer);
+    gbitmap_destroy(logIcon);  
+
+    bitmap_layer_destroy(spriteLayer);
+    gbitmap_destroy(spriteImg);
 
     tick_timer_service_unsubscribe();
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-    if(units_changed & MINUTE_UNIT) {
-        updateTime(tick_time);
-    }
-    if(units_changed & DAY_UNIT) {
-        updateDate(tick_time);
+    if (units_changed & SECOND_UNIT) { secondHandler(tick_time); }
+    if (units_changed & MINUTE_UNIT) { updateTime(tick_time); }
+    if (units_changed & DAY_UNIT) { updateDate(tick_time); }
+}
+
+static void secondHandler(struct tm *tick_time) {
+    if (sidebarVisible) {
+        secondsSinceLastAction++;
+        if (secondsSinceLastAction > SIDEBAR_DISPLAY_TIME) { hideSidebar(); }
     }
 }
 
-static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-    // increment water count
-    userServings.water++;
+static void hideSidebar() {
+    layer_remove_from_parent(bitmap_layer_get_layer(sidebarLayer));
+    layer_remove_from_parent(bitmap_layer_get_layer(foodIconLayer));
+    layer_remove_from_parent(bitmap_layer_get_layer(waterIconLayer));
+    layer_remove_from_parent(bitmap_layer_get_layer(logIconLayer));  
+    sidebarVisible = false;
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-    goToFoodSelect(); // load food select window
+    if (sidebarVisible) { goToFoodSelect(); // load food select window
+    } else { showSidebar(); }
+}
+
+static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
+    if (sidebarVisible) { userServings.water++; // increment water count
+    } else { showSidebar(); }
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) { 
-    goToLog(); // load log window
+    if (sidebarVisible) { goToLog(); // load log window
+    } else { showSidebar(); }    
 }
 
 static void click_config_provider(void *context) {

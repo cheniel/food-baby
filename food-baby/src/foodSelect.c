@@ -200,7 +200,8 @@ static void load(Window *window) {
   };
 
   // Initialize the simple menu layer
-  menuLayer = simple_menu_layer_create(bounds, window, menuSections, NUM_MENU_SECTIONS, NULL);
+  menuLayer = simple_menu_layer_create(bounds, window, menuSections, 
+    NUM_MENU_SECTIONS, NULL);
 
   // Add it to the window for display
   layer_add_child(window_layer, simple_menu_layer_get_layer(menuLayer));
