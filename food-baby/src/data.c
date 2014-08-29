@@ -76,6 +76,7 @@ void initData() {
  					persist_read_int(PKEY_ACT_RECORD):activityToday;
 
  	previousDate = calloc(MAX_DATE_CHAR, sizeof(char));
+
  	if (!persist_exists(PKEY_PREV_DATE)) {
  		APP_LOG(APP_LOG_LEVEL_DEBUG, "No previousDate found.");
  		strncpy(previousDate, "unset", MAX_DATE_CHAR);

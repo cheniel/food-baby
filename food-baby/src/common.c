@@ -66,7 +66,7 @@ char* getRecommendationForFood(Foods food) {
       return "good job!";
       break;
     default:
-      return "no food given";
+      return "ERR no food given";
       break;
   }
 }

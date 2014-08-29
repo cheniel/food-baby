@@ -147,11 +147,11 @@ static void load(Window *window) {
 }
 
 static void unload(Window *window) {
+    free(timeString);
+    free(dateString);
     text_layer_destroy(timeText);
     text_layer_destroy(dateText);
     text_layer_destroy(recText);
-    free(timeString);
-    free(dateString);
 
     bitmap_layer_destroy(sidebarLayer);
     gbitmap_destroy(sidebarImg);
@@ -332,7 +332,7 @@ static void updateDate(struct tm *tick_time) {
     text_layer_set_text(dateText, dateString);    
 
     if (isNewDate(dateString)) {
-        APP_LOG(APP_LOG_LEVEL_DEBUG, "entered conditional");
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "new date detected!");
         setNewDate(dateString);
         resetDailyData();
         saveData();
