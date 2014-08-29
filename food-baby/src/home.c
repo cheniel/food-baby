@@ -20,14 +20,13 @@
 #include "data.h"
 
 // ---------------- Constant definitions
-// static const int = 5
 
 // ---------------- Macro definitions
 #define TIME_FORMAT "%I:%M"
 #define DATE_FORMAT "%a, %b %e"
 #define SIDEBAR_DISPLAY_TIME 2
 #define SIDEBAR_XPOS 117
-#define SIDEBAR_YPOS 46
+#define SIDEBAR_YPOS 55
 
 #define RECOMMENDATION_XPOS 0
 #define RECOMMENDATION_YPOS 145
@@ -38,6 +37,12 @@
 #define SPRITE_STARTY 90
 #define SPRITE_XMIN 0
 #define SPRITE_XMAX PEBBLE_WIDTH - SPRITE_WIDTH
+
+#define DATE_XPOS 0 
+#define DATE_YPOS 35
+
+#define TIME_XPOS 0
+#define TIME_YPOS 0
 
 // ---------------- Structures/Types
 
@@ -109,7 +114,7 @@ static void addDateAndTime() {
     /* create time text */
     timeString = calloc(MAX_TIME_CHAR, sizeof(char));
     timeText = text_layer_create((GRect) { 
-        .origin = { 0, 0 }, 
+        .origin = { TIME_XPOS, TIME_YPOS }, 
         .size = { bounds.size.w, 34 } 
     });
     setTextLayerDefaults(timeText);
@@ -119,7 +124,7 @@ static void addDateAndTime() {
     /* create date text */
     dateString = calloc(MAX_DATE_CHAR, sizeof(char));
     dateText = text_layer_create((GRect) { 
-        .origin = { 0, 35 }, 
+        .origin = { DATE_XPOS, DATE_YPOS }, 
         .size = { bounds.size.w, 34 } 
     });
     setTextLayerDefaults(dateText);
