@@ -17,6 +17,9 @@
 #define MAX_TIME_CHAR 10
 #define MAX_DATE_CHAR 30
 
+#define PEBBLE_WIDTH 144
+#define PEBBLE_HEIGHT 168
+
 // ---------------- Structures/Types
 
 // ---------------- Public Variables

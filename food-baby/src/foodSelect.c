@@ -212,7 +212,6 @@ static void unload(Window *window) {
   simple_menu_layer_destroy(menuLayer);
 }
 
-
 char* getServingExample(char* foodGroup) {
   char** examples;
 

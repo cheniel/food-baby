@@ -29,6 +29,16 @@
 #define SIDEBAR_XPOS 117
 #define SIDEBAR_YPOS 46
 
+#define RECOMMENDATION_XPOS 0
+#define RECOMMENDATION_YPOS 145
+
+#define SPRITE_WIDTH 40
+#define SPRITE_HEIGHT 40
+#define SPRITE_STARTX PEBBLE_WIDTH / 2 - SPRITE_WIDTH / 2
+#define SPRITE_STARTY 90
+#define SPRITE_XMIN 0
+#define SPRITE_XMAX PEBBLE_WIDTH - SPRITE_WIDTH
+
 // ---------------- Structures/Types
 
 // ---------------- Private variables
@@ -127,7 +137,7 @@ static void makeRecommendation(char* recommendation) {
     if (!recText) {
         /* create recommendation text */
         recText = text_layer_create((GRect) { 
-            .origin = { 0, 145 }, 
+            .origin = { RECOMMENDATION_XPOS, RECOMMENDATION_YPOS }, 
             .size = { bounds.size.w, 20 } 
         });
         setTextLayerDefaults(recText);
@@ -179,7 +189,7 @@ static void load(Window *window) {
 
     addDateAndTime();
     makeRecommendation("drink more water!");
-    createSprite(10, 90);
+    createSprite(SPRITE_STARTX, SPRITE_STARTY);
     createSidebar(SIDEBAR_XPOS, SIDEBAR_YPOS);
 
     secondsSinceLastAction = 0;
@@ -191,7 +201,7 @@ static void load(Window *window) {
 static void createSprite(int x, int y) {
     /* create sprite */
     spriteImg = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_IDLE);
-    spriteLayer = bitmap_layer_create(GRect(x, y, 40, 40));
+    spriteLayer = bitmap_layer_create(GRect(x, y, SPRITE_WIDTH, SPRITE_HEIGHT));
     bitmap_layer_set_bitmap(spriteLayer, spriteImg);
 }
 
@@ -249,18 +259,18 @@ static void hideSidebar() {
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-    if (sidebarVisible) { goToFoodSelect(); // load food select window
-    } else { showSidebar(); }
+    if (sidebarVisible) { goToFoodSelect(); } // load food select window
+    else { showSidebar(); } // or show sidebar
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-    if (sidebarVisible) { userServings.water++; // increment water count
-    } else { showSidebar(); }
+    if (sidebarVisible) { userServings.water++; }// increment water count
+    else { showSidebar(); } // or show sidebar
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) { 
-    if (sidebarVisible) { goToLog(); // load log window
-    } else { showSidebar(); }    
+    if (sidebarVisible) { goToLog(); } // load log window
+    else { showSidebar(); } // or show sidebar    
 }
 
 static void click_config_provider(void *context) {
@@ -275,17 +285,13 @@ static void updateTime(struct tm *tick_time) {
 
     /* remove preceding 0 if there is one */
     if ( !strncmp(timeString, "0", 1) ) {
-
         // skip the first character and change the time
         timeString++;
         text_layer_set_text(timeText, timeString);    
         timeString--; // to prevent free error
-
     } else {
-
         // push time string changes to display
         text_layer_set_text(timeText, timeString);
-
     }
 }
 
