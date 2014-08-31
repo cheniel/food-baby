@@ -330,6 +330,7 @@ static void updateDate(struct tm *tick_time) {
         setNewDate(dateString);
         resetDailyData();
         saveData();
+        makeRecommendation();
     }
 }
 
