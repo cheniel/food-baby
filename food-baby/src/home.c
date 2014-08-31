@@ -50,6 +50,8 @@
 #define TIME_XPOS 0
 #define TIME_YPOS 0
 
+#define TIME_TO_SLEEP 7
+
 // ---------------- Structures/Types
 enum SpriteStates {
     sad,
@@ -64,6 +66,7 @@ static TextLayer *recText;
 static char *timeString;
 static char *dateString;
 static int secondsSinceLastAction;
+extern int minutesSinceLastShake;
 static bool sidebarVisible;
 
 static BitmapLayer *sidebarLayer;
@@ -135,6 +138,7 @@ static void load(Window *window) {
     createSidebar(SIDEBAR_XPOS, SIDEBAR_YPOS);
 
     secondsSinceLastAction = 0;
+    minutesSinceLastShake = 0;
     sidebarVisible = false;
 
     addLayersToWindow();
@@ -303,6 +307,13 @@ static void click_config_provider(void *context) {
 
 
 static void updateTime(struct tm *tick_time) {
+    minutesSinceLastShake++;
+
+    // TEMPORARY
+    if (minutesSinceLastShake >= TIME_TO_SLEEP) { 
+        text_layer_set_text(recText, "zzz");
+    }
+
     strftime(timeString, MAX_TIME_CHAR, TIME_FORMAT, tick_time);
 
     /* remove preceding 0 if there is one */

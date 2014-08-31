@@ -54,6 +54,7 @@ int activityToday;
 int activityRecord;
 bool minSatisfied;
 char *previousDate;
+int minutesSinceLastShake;
 
 // ---------------- Private prototypes
 

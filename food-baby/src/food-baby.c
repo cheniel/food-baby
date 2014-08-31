@@ -33,6 +33,7 @@ extern Window *foodSelect;
 extern Window *logview;
 extern int activityToday;
 extern int activityRecord;
+extern int minutesSinceLastShake;
 
 // ---------------- Private prototypes
 int main(void);
@@ -50,7 +51,7 @@ int main(void) {
 
 static void tapHandler(AccelAxisType axis, int32_t direction) {
     activityToday++;
-
+    minutesSinceLastShake = 0;
     if (activityToday > activityRecord) { activityRecord = activityToday; }
 }
 
