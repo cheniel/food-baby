@@ -30,6 +30,7 @@ void freeResources();
 bool isNewDate(char* currentDate);
 void setNewDate(char* newDate);
 Foods getRecommendation();
+SpriteState getSpriteState();
 
 /* ========================================================================== */
 

@@ -12,7 +12,8 @@
 #include <pebble.h>
 
 // ---------------- Local includes  e.g., "file.h"
-#include "data.h"                       
+#include "data.h"   
+#include "common.h"                    
 
 // ---------------- Constant definitions
 const ServingCount minRecServings = {
@@ -41,6 +42,8 @@ const ServingCount maxRecServings = {
 #define PKEY_FOOD_COUNT 1105551231
 #define PKEY_PREV_DATE 1108424242
 
+#define SATISFIED_THRES 4
+
 // ---------------- Structures/Types
 
 // ---------------- Private variables
@@ -50,11 +53,13 @@ int activityRecord;
 bool minSatisfied;
 char *previousDate;
 int minutesSinceLastShake;
+SpriteState currentSpriteState;
 
 // ---------------- Private prototypes
-
+static bool spriteIsContent();
 
 /* ========================================================================== */
+
 
 void initData() {
 	if (persist_exists(PKEY_FOOD_COUNT)) {
@@ -85,7 +90,72 @@ void initData() {
  		persist_read_string(PKEY_PREV_DATE, previousDate, MAX_DATE_CHAR);
  	}
 
+ 	minSatisfied = false;
+
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "previousDate is %s", previousDate);
+}
+
+SpriteState getSpriteState() {
+	if (minutesSinceLastShake >= TIME_TO_SLEEP) {
+		currentSpriteState = spriteAsleep;
+	} else if (minSatisfied) {
+		currentSpriteState = spriteHappy;
+	} else if (spriteIsContent()) {
+		currentSpriteState = spriteContent;
+	} else {
+		currentSpriteState = spriteSad;
+	}
+
+	return currentSpriteState;
+}
+
+static bool spriteIsContent() {
+	int remainingGroups = NUM_OF_FOOD_GROUPS;
+	int satisfiedGroups = 0;
+
+	double pwater = (double) userServings.water / 
+					(double) minRecServings.water;
+	if (pwater >= 1.0) { satisfiedGroups++; }
+	if (satisfiedGroups >= SATISFIED_THRES) { return true; }
+	remainingGroups--;
+	if (remainingGroups + satisfiedGroups < SATISFIED_THRES) { return false; }
+
+	double pgrains = (double) userServings.grains / 
+					(double) minRecServings.grains;
+	if (pgrains >= 1.0) { satisfiedGroups++; }
+	if (satisfiedGroups >= SATISFIED_THRES) { return true; }
+	remainingGroups--;
+	if (remainingGroups + satisfiedGroups < SATISFIED_THRES) { return false; }
+
+	double pveggies = (double) userServings.veggies / 
+					(double) minRecServings.veggies;
+	if (pveggies >= 1.0) { satisfiedGroups++; }
+	if (satisfiedGroups >= SATISFIED_THRES) { return true; }
+	remainingGroups--;
+	if (remainingGroups + satisfiedGroups < SATISFIED_THRES) { return false; }
+
+	double pfruit = (double) userServings.fruit / 
+					(double) minRecServings.fruit;
+	if (pfruit >= 1.0) { satisfiedGroups++; }
+	if (satisfiedGroups >= SATISFIED_THRES) { return true; }
+	remainingGroups--;
+	if (remainingGroups + satisfiedGroups < SATISFIED_THRES) { return false; }
+
+	double pdairy = (double) userServings.dairy / 
+					(double) minRecServings.dairy;
+	if (pdairy >= 1.0) { satisfiedGroups++; }
+	if (satisfiedGroups >= SATISFIED_THRES) { return true; }
+	remainingGroups--;
+	if (remainingGroups + satisfiedGroups < SATISFIED_THRES) { return false; }
+
+	double pprotein = (double) userServings.protein / 
+					(double) minRecServings.protein;
+	if (pprotein >= 1.0) { satisfiedGroups++; }
+	if (satisfiedGroups >= SATISFIED_THRES) { return true; }
+	remainingGroups--;
+	if (remainingGroups + satisfiedGroups < SATISFIED_THRES) { return false; }
+
+	return false;
 }
 
 Foods getRecommendation() {
@@ -177,6 +247,7 @@ void resetDailyData() {
  	};
 
  	activityToday = 0;
+ 	minSatisfied = false;
 
  	saveData();
 }

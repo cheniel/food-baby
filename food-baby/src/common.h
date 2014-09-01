@@ -25,6 +25,9 @@
 #define PEBBLE_WIDTH 144
 #define PEBBLE_HEIGHT 168
 
+#define TIME_TO_SLEEP 7
+#define NUM_OF_FOOD_GROUPS 6
+
 // ---------------- Structures/Types
 typedef enum Foods {
 	water,
@@ -44,6 +47,13 @@ typedef struct ServingCount {
 	int dairy;
 	int protein;
 } ServingCount;
+
+typedef enum SpriteState {
+    spriteAsleep,
+    spriteSad,
+    spriteContent,
+    spriteHappy,
+} SpriteState;
 
 // ---------------- Public Variables
 
