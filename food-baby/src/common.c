@@ -45,22 +45,22 @@ void setTextLayerDefaults(TextLayer *textlayer) {
 char* getRecommendationForFood(Foods food) {
   switch (food) {
     case water:
-      return "drink some water!";
+      return "drink some water";
       break;
     case grains:
       return "have some grains";
       break;
     case veggies:
-      return "eat your veggies!";
+      return "eat your veggies";
       break;
     case fruit:
-      return "try some fruit";
+      return "eat some fruit";
       break;
     case dairy:
       return "have some dairy";
       break;
     case protein:
-      return "make sure to get protein";
+      return "have some protein";
       break;
     case none:
       return "good job!";

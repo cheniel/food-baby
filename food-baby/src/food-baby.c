@@ -52,6 +52,10 @@ int main(void) {
 static void tapHandler(AccelAxisType axis, int32_t direction) {
     activityToday++;
     minutesSinceLastShake = 0;
+
+    // if the current state is sleeping
+        // wake up the sprite
+
     if (activityToday > activityRecord) { activityRecord = activityToday; }
 }
 

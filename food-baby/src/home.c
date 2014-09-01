@@ -312,6 +312,8 @@ static void updateTime(struct tm *tick_time) {
     // TEMPORARY
     if (minutesSinceLastShake >= TIME_TO_SLEEP) { 
         text_layer_set_text(recText, "zzz");
+    } else {
+        makeRecommendation();
     }
 
     strftime(timeString, MAX_TIME_CHAR, TIME_FORMAT, tick_time);
