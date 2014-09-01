@@ -1,8 +1,13 @@
 /* ========================================================================== */
 /* 
+ * logview.c
  *
+ * Project Name: Food Baby
+ * Author: cheniel
  *
- *
+ * Contains functions used to display log view window, which is where the user
+ * sees what food he/she has logged so far in the day, and how active he/she
+ * has been. 
  */
 /* ========================================================================== */
 
@@ -16,7 +21,6 @@
 #include "data.h"
  
 // ---------------- Constant definitions
-// static const int = 5
 
 // ---------------- Macro definitions
 #define NUM_ROWS 10

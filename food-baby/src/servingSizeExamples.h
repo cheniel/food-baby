@@ -2,11 +2,17 @@
 /* 
  * servingSizeExamples.h
  *
- *
+ * Project Name: Food Baby
+ * Author: cheniel
+ * 
+ * Contains arrays containing examples of servings in each food group. Used in
+ * foodSelect.c for the logging window.
  */
 /* ========================================================================== */
 #ifndef SERVINGSIZE_H
 #define SERVINGSIZE_H
+
+#define NUM_SERVING_EXAMPLES 8
 
 char* servingSizeGrains[] = {
   "e.g. a slice of bread",

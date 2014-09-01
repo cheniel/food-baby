@@ -1,6 +1,11 @@
 /* ========================================================================== */
 /* 
+ * common.h
  *
+ * Project Name: Food Baby
+ * Author: cheniel
+ *
+ * Contains declarations for common functions, structures and datatypes.
  */
 /* ========================================================================== */
 #ifndef COMMON_H
@@ -30,6 +35,15 @@ typedef enum Foods {
 	protein,
 	none,
 } Foods;
+
+typedef struct ServingCount {
+	int water;
+	int grains;
+	int veggies;
+	int fruit;
+	int dairy;
+	int protein;
+} ServingCount;
 
 // ---------------- Public Variables
 

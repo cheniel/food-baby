@@ -1,7 +1,11 @@
 /* ========================================================================== */
-/* File: log.h
- *
- *
+/* 
+ * logview.h
+ * 
+ * Project Name: Food Baby
+ * Author: cheniel
+ * 
+ * Header for logview.c, which contains the log window.
  */
 /* ========================================================================== */
 #ifndef LOG_H

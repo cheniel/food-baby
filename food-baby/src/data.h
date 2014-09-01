@@ -1,8 +1,12 @@
 /* ========================================================================== */
 /* 
+ * data.h
+ * 
+ * Project Name: Food Baby
+ * Author: cheniel
  *
- *
- *
+ * Contains function declarations for functions that have to deal with 
+ * instantiating and modifying persistent data.
  */
 /* ========================================================================== */
 #ifndef DATA_H
@@ -14,14 +18,6 @@
 // ---------------- Constants
 
 // ---------------- Structures/Types
-typedef struct ServingCount {
-	int water;
-	int grains;
-	int veggies;
-	int fruit;
-	int dairy;
-	int protein;
-} ServingCount;
 
 // ---------------- Public Variables
 

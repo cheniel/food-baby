@@ -1,8 +1,11 @@
 /* ========================================================================== */
 /* 
+ * foodSelect.c
+ * 
+ * Project Name: Food Baby
+ * Author: cheniel
  *
- *
- *
+ * 
  */
 /* ========================================================================== */
 
@@ -22,7 +25,6 @@
 // ---------------- Macro definitions
 #define NUM_MENU_SECTIONS 2
 #define NUM_FOOD_GROUPS 5
-#define NUM_SERVING_EXAMPLES 8
 #define NUM_SETTINGS 2
 #define MAX_COMPARE_SIZE 10
 #define ANIMATED_SETTING true
