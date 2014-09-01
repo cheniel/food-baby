@@ -38,12 +38,7 @@ const ServingCount maxRecServings = {
 // keys for persistant storage
 #define PKEY_ACT_TODAY 1100424242
 #define PKEY_ACT_RECORD 1101424242
-#define PKEY_WATER 1102424242
-#define PKEY_GRAINS 1103424242
-#define PKEY_VEG 1104424242
-#define PKEY_FRUIT 1105424242
-#define PKEY_DAIRY 1106424242
-#define PKEY_PROTEIN 1107424242
+#define PKEY_FOOD_COUNT 1105551231
 #define PKEY_PREV_DATE 1108424242
 
 // ---------------- Structures/Types
@@ -62,14 +57,18 @@ int minutesSinceLastShake;
 /* ========================================================================== */
 
 void initData() {
- 	userServings = (ServingCount) {
- 		.water = persist_exists(PKEY_WATER) ? persist_read_int(PKEY_WATER):0,
- 		.grains = persist_exists(PKEY_GRAINS) ? persist_read_int(PKEY_GRAINS):0,
- 		.veggies = persist_exists(PKEY_VEG) ? persist_read_int(PKEY_VEG):0,
- 		.fruit = persist_exists(PKEY_FRUIT) ? persist_read_int(PKEY_FRUIT):0,
- 		.dairy = persist_exists(PKEY_DAIRY) ? persist_read_int(PKEY_DAIRY):0,
- 		.protein= persist_exists(PKEY_PROTEIN)?persist_read_int(PKEY_PROTEIN):0,
- 	};
+	if (persist_exists(PKEY_FOOD_COUNT)) {
+		persist_read_data(PKEY_FOOD_COUNT, &userServings, sizeof(userServings));
+	} else {
+	 	userServings = (ServingCount) {
+	 		.water = 0,
+	 		.grains = 0,
+	 		.veggies = 0,
+	 		.fruit = 0,
+	 		.dairy = 0,
+	 		.protein= 0,
+	 	};		
+	}
 
  	activityToday = persist_exists(PKEY_ACT_TODAY)?
  					persist_read_int(PKEY_ACT_TODAY):0;
@@ -191,12 +190,7 @@ void saveData() {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "saving data");
 	persist_write_int(PKEY_ACT_TODAY, activityToday);
 	persist_write_int(PKEY_ACT_RECORD, activityRecord);
-	persist_write_int(PKEY_WATER, userServings.water);
-	persist_write_int(PKEY_GRAINS, userServings.grains);
-	persist_write_int(PKEY_VEG, userServings.veggies);
-	persist_write_int(PKEY_FRUIT, userServings.fruit);
-	persist_write_int(PKEY_DAIRY, userServings.dairy);
-	persist_write_int(PKEY_PROTEIN, userServings.protein);
+	persist_write_data(PKEY_FOOD_COUNT, &userServings, sizeof(userServings));
 	persist_write_string(PKEY_PREV_DATE, previousDate);
 }
 

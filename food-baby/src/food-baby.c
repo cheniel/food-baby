@@ -67,8 +67,7 @@ static void init(void) {
 
     accel_tap_service_subscribe(tapHandler);
 
-    srand(time(NULL)); // for random ops. 
-    // causes memory leak... see:
+    srand(time(NULL)); // for random ops. causes negligible memory leak... see:
     // http://forums.getpebble.com/discussion/10498/srand-rand-memory-leak
 
     window_stack_push(home, ANIMATION_SETTING);
