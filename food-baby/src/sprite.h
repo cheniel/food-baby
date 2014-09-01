@@ -1,11 +1,12 @@
 /* ========================================================================== */
 /* 
- * File: home.h
+ * File: sprite.h
+ *
  *
  */
 /* ========================================================================== */
-#ifndef HOME_H
-#define HOME_H
+#ifndef SPRITE_H
+#define SPRITE_H
 
 // ---------------- Prerequisites e.g., Requires "math.h"
 
@@ -16,7 +17,7 @@
 // ---------------- Public Variables
 
 // ---------------- Prototypes/Macros
-Window *homeInit();
-void makeRecommendation();
+void initSprite(Layer* windowLayer);
+void createSprite();
 
-#endif // HOME_H
+#endif // SPRITE_H

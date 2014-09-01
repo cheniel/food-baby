@@ -20,6 +20,7 @@
 #include "common.h"
 #include "data.h"
 #include "home.h"
+#include "sprite.h"
 
 // ---------------- Constant definitions
 
@@ -33,27 +34,16 @@
 #define RECOMMENDATION_XPOS 0
 #define RECOMMENDATION_YPOS 145
 
-#define SPRITE_WIDTH 40
-#define SPRITE_HEIGHT 40
-#define SPRITE_STARTX PEBBLE_WIDTH / 2 - SPRITE_WIDTH / 2
-#define SPRITE_STARTY RECOMMENDATION_YPOS - SPRITE_HEIGHT - 5
-#define SPRITE_XMIN 0
-#define SPRITE_XMAX PEBBLE_WIDTH - SPRITE_WIDTH
-
 #define DATE_XPOS 0 
 #define DATE_YPOS 35
 
 #define TIME_XPOS 0
 #define TIME_YPOS 0
 
+// remove later
 #define TIME_TO_SLEEP 7
 
 // ---------------- Structures/Types
-enum SpriteStates {
-    sad,
-    sleeping,
-    happy,
-};
 
 // ---------------- Private variables
 static TextLayer *timeText;
@@ -68,9 +58,6 @@ static bool sidebarVisible;
 static BitmapLayer *sidebarLayer;
 static GBitmap *sidebarImg;
 
-static BitmapLayer *spriteLayer;
-static GBitmap *spriteImg;
-
 static BitmapLayer *foodIconLayer;
 static GBitmap *foodIcon;
 
@@ -82,7 +69,7 @@ static GBitmap *logIcon;
 
 extern ServingCount userServings;
 
-static Layer *window_layer;
+static Layer *windowLayer;
 static GRect bounds;
 
 // ---------------- Private prototypes
@@ -94,7 +81,6 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed);
 static void addDateAndTime();
 static void addLayersToWindow();
 static void showSidebar();
-static void createSprite(int x, int y);
 static void hideSidebar();
 static void createSidebar(int x, int y);
 
@@ -121,8 +107,8 @@ Window *homeInit() {
 }
 
 static void load(Window *window) {
-    window_layer = window_get_root_layer(window);
-    bounds = layer_get_bounds(window_layer);
+    windowLayer = window_get_root_layer(window);
+    bounds = layer_get_bounds(windowLayer);
 
     /* initialize services */
     tick_timer_service_subscribe(SECOND_UNIT, tick_handler); 
@@ -130,7 +116,7 @@ static void load(Window *window) {
     addDateAndTime();
 
     makeRecommendation();
-    createSprite(SPRITE_STARTX, SPRITE_STARTY);
+    initSprite(windowLayer);
     createSidebar(SIDEBAR_XPOS, SIDEBAR_YPOS);
 
     secondsSinceLastAction = 0;
@@ -158,9 +144,6 @@ static void unload(Window *window) {
     
     bitmap_layer_destroy(logIconLayer);
     gbitmap_destroy(logIcon);  
-
-    bitmap_layer_destroy(spriteLayer);
-    gbitmap_destroy(spriteImg);
 
     tick_timer_service_unsubscribe();
 }
@@ -233,28 +216,20 @@ static void createSidebar(int x, int y) {
 }
 
 static void showSidebar() {
-    layer_add_child(window_layer, bitmap_layer_get_layer(sidebarLayer));
-    layer_add_child(window_layer, bitmap_layer_get_layer(foodIconLayer));
-    layer_add_child(window_layer, bitmap_layer_get_layer(waterIconLayer));
-    layer_add_child(window_layer, bitmap_layer_get_layer(logIconLayer));    
+    layer_add_child(windowLayer, bitmap_layer_get_layer(sidebarLayer));
+    layer_add_child(windowLayer, bitmap_layer_get_layer(foodIconLayer));
+    layer_add_child(windowLayer, bitmap_layer_get_layer(waterIconLayer));
+    layer_add_child(windowLayer, bitmap_layer_get_layer(logIconLayer));    
 
     secondsSinceLastAction = 0;
     sidebarVisible = true;
 }
 
-static void createSprite(int x, int y) {
-    /* create sprite */
-    spriteImg = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_IDLE);
-    spriteLayer = bitmap_layer_create(GRect(x, y, SPRITE_WIDTH, SPRITE_HEIGHT));
-    bitmap_layer_set_bitmap(spriteLayer, spriteImg);
-}
-
 static void addLayersToWindow() {
     /* add text layers to window */
-    layer_add_child(window_layer, text_layer_get_layer(timeText));
-    layer_add_child(window_layer, text_layer_get_layer(dateText));
-    layer_add_child(window_layer, text_layer_get_layer(recText));
-    layer_add_child(window_layer, bitmap_layer_get_layer(spriteLayer));
+    layer_add_child(windowLayer, text_layer_get_layer(timeText));
+    layer_add_child(windowLayer, text_layer_get_layer(dateText));
+    layer_add_child(windowLayer, text_layer_get_layer(recText));
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
