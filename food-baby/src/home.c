@@ -145,6 +145,8 @@ static void unload(Window *window) {
     bitmap_layer_destroy(logIconLayer);
     gbitmap_destroy(logIcon);  
 
+    deinitSprite();
+
     tick_timer_service_unsubscribe();
 }
 

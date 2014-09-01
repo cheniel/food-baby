@@ -18,6 +18,6 @@
 
 // ---------------- Prototypes/Macros
 void initSprite(Layer* windowLayer);
-void createSprite();
+void deinitSprite();
 
 #endif // SPRITE_H

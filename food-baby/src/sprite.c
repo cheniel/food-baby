@@ -23,8 +23,8 @@
 // ---------------- Constant definitions
 
 // ---------------- Macro definitions
-#define SPRITE_WIDTH 40
-#define SPRITE_HEIGHT 40
+#define SPRITE_WIDTH 45
+#define SPRITE_HEIGHT 45
 #define SPRITE_STARTX PEBBLE_WIDTH / 2 - SPRITE_WIDTH / 2
 #define SPRITE_STARTY 140 - SPRITE_HEIGHT
 #define SPRITE_XMIN 0
@@ -46,6 +46,7 @@ static GBitmap *spriteImg;
 static Layer* window;
 
 // ---------------- Private prototypes
+void createSprite();
 
 /* ========================================================================== */
 
@@ -56,7 +57,6 @@ void initSprite(Layer* windowLayer) {
 }
 
 void createSprite() {
-    /* create sprite */
     spriteImg = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_IDLE);
     spriteLayer = bitmap_layer_create(GRect(SPRITE_STARTX, SPRITE_STARTY, SPRITE_WIDTH, SPRITE_HEIGHT));
     bitmap_layer_set_bitmap(spriteLayer, spriteImg);
