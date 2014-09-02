@@ -31,9 +31,10 @@
 #define SPRITE_XMIN 0
 #define SPRITE_XMAX PEBBLE_WIDTH - SPRITE_WIDTH
 
-#define SLEEP_COUNT 3
+#define SLEEP_COUNT 24
+#define SLEEP_COUNT_DIV 8
 
-#define ANIMATION_DURATION_MS 7000
+#define ANIMATION_DURATION_MS 3000
 
 // ---------------- Structures/Types
 typedef struct SpriteInfo {
@@ -146,7 +147,7 @@ static void sleepAnimSetup(struct Animation *animation) {
         .size = { 15, 15 }
     });
 
-    for (int z = 0; z < SLEEP_COUNT; z++) {
+    for (int z = 0; z < SLEEP_COUNT / SLEEP_COUNT_DIV; z++) {
         text_layer_set_text(sleepZZZs[z], "z");
         setTextLayerDefaults(sleepZZZs[z]);
     }
@@ -168,29 +169,30 @@ static void sleepAnimUpdate(struct Animation *animation,
         sleepCounter = 0;
 
         // remove all displayed Zs
-        for (int z = 0; z < SLEEP_COUNT; z++) {
+        for (int z = 0; z < SLEEP_COUNT / SLEEP_COUNT_DIV; z++) {
             layer_remove_from_parent(text_layer_get_layer(sleepZZZs[z]));
         }   
 
     } else {
 
         // make Z at sleepCounter visible 
-        layer_add_child(window, text_layer_get_layer(sleepZZZs[sleepCounter]));
+        layer_add_child(window, 
+            text_layer_get_layer(sleepZZZs[sleepCounter / SLEEP_COUNT_DIV]));
 
         sleepCounter++;
     }
 
-    psleep(1000);
+    psleep(1000 / SLEEP_COUNT_DIV);
 }
 
 static void sleepAnimTeardown(struct Animation *animation) {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "tearing down animation");
-    for (int z = 0; z < SLEEP_COUNT; z++) { text_layer_destroy(sleepZZZs[z]); }
+    for (int z = 0; z < SLEEP_COUNT / SLEEP_COUNT_DIV; z++) { 
+        text_layer_destroy(sleepZZZs[z]); 
+    }
 
     if (continueAnimation) { startAnimation(); } 
 }
-
-
 
 void stopAnimation() {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "stopping animation");

@@ -27,7 +27,7 @@
 			{
 				"type": "png",
 				"name": "SPRITE_IDLE",
-				"file": "placeholder.png"
+				"file": "simpleSprite.png"
 			},
 			{
 				"type": "png",
