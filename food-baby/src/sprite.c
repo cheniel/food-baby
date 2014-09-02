@@ -47,10 +47,11 @@ static BitmapLayer *spriteLayer;
 static GBitmap *spriteImg;
 static Layer* window;
 static SpriteInfo baby;
-static Animation *sleepAnim;
+static Animation *animation;
 
 static int sleepCounter;
 static TextLayer *sleepZZZs[SLEEP_COUNT];
+static bool continueAnimation;
 
 // ---------------- Private prototypes
 static void createSprite();
@@ -59,6 +60,7 @@ static void sleepAnimSetup(struct Animation *animation);
 static void sleepAnimUpdate(struct Animation *animation, 
     const uint32_t time_normalized);
 static void sleepAnimTeardown(struct Animation *animation);
+static void stopAnimation();
 
 // ----------------- Animation Structures
 static const AnimationImplementation sleepAnimImpl = {
@@ -78,9 +80,12 @@ void initSprite(Layer* windowLayer) {
         .state = spriteAsleep,
     };
 
+    continueAnimation = true;
+
     createSprite();
     layer_add_child(window, bitmap_layer_get_layer(spriteLayer));
 
+    animation = animation_create();
     startAnimation();
 }
 
@@ -95,35 +100,33 @@ static void startAnimation() {
 
     APP_LOG(APP_LOG_LEVEL_DEBUG, "determining baby state: ");
 
-    sleepAnim = animation_create();
-
     switch (baby.state) {
         case spriteAsleep:
             APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteAsleep");
-            animation_set_duration(sleepAnim, ANIMATION_DURATION_MS);
-            animation_set_implementation(sleepAnim, &sleepAnimImpl);
+            animation_set_duration(animation, ANIMATION_DURATION_MS);
+            animation_set_implementation(animation, &sleepAnimImpl);
             break;
         case spriteSad:
             APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteSad");
-            animation_set_duration(sleepAnim, ANIMATION_DURATION_MS);
-            animation_set_implementation(sleepAnim, &sleepAnimImpl);
+            animation_set_duration(animation, ANIMATION_DURATION_MS);
+            animation_set_implementation(animation, &sleepAnimImpl);
             break;
         case spriteContent:
             APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteContent");
-            animation_set_duration(sleepAnim, ANIMATION_DURATION_MS);
-            animation_set_implementation(sleepAnim, &sleepAnimImpl);
+            animation_set_duration(animation, ANIMATION_DURATION_MS);
+            animation_set_implementation(animation, &sleepAnimImpl);
             break;
         case spriteHappy:
             APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteHappy");
-            animation_set_duration(sleepAnim, ANIMATION_DURATION_MS);
-            animation_set_implementation(sleepAnim, &sleepAnimImpl);
+            animation_set_duration(animation, ANIMATION_DURATION_MS);
+            animation_set_implementation(animation, &sleepAnimImpl);
             break;
         default:
             APP_LOG(APP_LOG_LEVEL_ERROR, "startAnimation: INVALID STATE");
             break;
     }
 
-    animation_schedule(sleepAnim);
+    animation_schedule(animation);
 }
 
 static void sleepAnimSetup(struct Animation *animation) {
@@ -147,7 +150,6 @@ static void sleepAnimSetup(struct Animation *animation) {
     for (int z = 0; z < SLEEP_COUNT; z++) {
         text_layer_set_text(sleepZZZs[z], "z");
         setTextLayerDefaults(sleepZZZs[z]);
-
     }
 
     // move baby to center
@@ -182,14 +184,26 @@ static void sleepAnimUpdate(struct Animation *animation,
 }
 
 static void sleepAnimTeardown(struct Animation *animation) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "tearing down animation");
     for (int z = 0; z < SLEEP_COUNT; z++) { text_layer_destroy(sleepZZZs[z]); }
 
-    startAnimation();
+    if (continueAnimation) { 
+        startAnimation(); 
+    } else {
+        animation_destroy(animation);
+    }
+}
+
+static void stopAnimation() {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "stopping animation");
+    continueAnimation = false;
+    animation_unschedule(animation);
 }
 
 void deinitSprite() {
     bitmap_layer_destroy(spriteLayer);
     gbitmap_destroy(spriteImg);
+    stopAnimation();
 }
 
 
