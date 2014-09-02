@@ -78,8 +78,6 @@ void initSprite(Layer* windowLayer) {
         .state = spriteAsleep,
     };
 
-    continueAnimation = true;
-
     createSprite();
     layer_add_child(window, bitmap_layer_get_layer(spriteLayer));
 
@@ -99,6 +97,7 @@ void startAnimation() {
 
     APP_LOG(APP_LOG_LEVEL_DEBUG, "determining baby state: ");
 
+    continueAnimation = true;
 
     switch (baby.state) {
         case spriteAsleep:
