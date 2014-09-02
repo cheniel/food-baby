@@ -19,6 +19,7 @@
 #include "data.h"
 #include "servingSizeExamples.h"
 #include "home.h"
+#include "sprite.h"
 
 // ---------------- Constant definitions
 
@@ -179,6 +180,7 @@ static void load(Window *window) {
 
 static void unload(Window *window) {
   simple_menu_layer_destroy(menuLayer);
+  startAnimation();
 }
 
 char* getServingExample(char* foodGroup) {

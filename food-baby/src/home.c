@@ -256,20 +256,31 @@ static void hideSidebar() {
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-    if (sidebarVisible) { goToFoodSelect(); } // load food select window
-    else { showSidebar(); } // or show sidebar
+    if (sidebarVisible) { 
+        stopAnimation();
+        goToFoodSelect(); // load food select window
+    } else { 
+        showSidebar(); // or show sidebar
+    } 
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-    if (sidebarVisible) { userServings.water++; }// increment water count
-    else { showSidebar(); } // or show sidebar
+    if (sidebarVisible) { 
+        userServings.water++; // increment water count
+    } else { 
+        showSidebar(); // or show sidebar
+    } 
 
     makeRecommendation();
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) { 
-    if (sidebarVisible) { goToLog(); } // load log window
-    else { showSidebar(); } // or show sidebar    
+    if (sidebarVisible) { 
+        stopAnimation();
+        goToLog(); // load log window
+    } else { 
+        showSidebar(); // or show sidebar 
+    }    
 }
 
 static void click_config_provider(void *context) {

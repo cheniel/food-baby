@@ -19,7 +19,8 @@
 // ---------------- Local includes  e.g., "file.h"
 #include "common.h"
 #include "data.h"
- 
+#include "sprite.h"
+
 // ---------------- Constant definitions
 
 // ---------------- Macro definitions
@@ -131,6 +132,8 @@ static void unload(Window *window) {
     text_layer_destroy(column2[row]);
     free(col2values[row]);
   }
+
+  startAnimation();
 }
 
 static void addTextLayersToWindow(Layer* windowLayer) {

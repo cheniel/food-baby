@@ -55,12 +55,10 @@ static bool continueAnimation;
 
 // ---------------- Private prototypes
 static void createSprite();
-static void startAnimation();
 static void sleepAnimSetup(struct Animation *animation);
 static void sleepAnimUpdate(struct Animation *animation, 
     const uint32_t time_normalized);
 static void sleepAnimTeardown(struct Animation *animation);
-static void stopAnimation();
 
 // ----------------- Animation Structures
 static const AnimationImplementation sleepAnimImpl = {
@@ -86,6 +84,7 @@ void initSprite(Layer* windowLayer) {
     layer_add_child(window, bitmap_layer_get_layer(spriteLayer));
 
     animation = animation_create();
+
     startAnimation();
 }
 
@@ -95,10 +94,11 @@ static void createSprite() {
     bitmap_layer_set_bitmap(spriteLayer, spriteImg);
 }
 
-static void startAnimation() {
+void startAnimation() {
     baby.state = getSpriteState();
 
     APP_LOG(APP_LOG_LEVEL_DEBUG, "determining baby state: ");
+
 
     switch (baby.state) {
         case spriteAsleep:
@@ -158,6 +158,7 @@ static void sleepAnimSetup(struct Animation *animation) {
 
     // change icon to sleeping
 
+
     sleepCounter = 0;
 }
 
@@ -187,14 +188,12 @@ static void sleepAnimTeardown(struct Animation *animation) {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "tearing down animation");
     for (int z = 0; z < SLEEP_COUNT; z++) { text_layer_destroy(sleepZZZs[z]); }
 
-    if (continueAnimation) { 
-        startAnimation(); 
-    } else {
-        animation_destroy(animation);
-    }
+    if (continueAnimation) { startAnimation(); } 
 }
 
-static void stopAnimation() {
+
+
+void stopAnimation() {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "stopping animation");
     continueAnimation = false;
     animation_unschedule(animation);
@@ -203,6 +202,7 @@ static void stopAnimation() {
 void deinitSprite() {
     bitmap_layer_destroy(spriteLayer);
     gbitmap_destroy(spriteImg);
+    animation_destroy(animation);
     stopAnimation();
 }
 
