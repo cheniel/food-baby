@@ -136,24 +136,28 @@ static void sleepAnimSetup(struct Animation *animation) {
 
     // set up ZZZs
     sleepZZZs[0] = text_layer_create((GRect) {
-        .origin = { 90, 90 },
+        .origin = { 85, 90 },
         .size = { 15, 15 }
     });
 
     sleepZZZs[1] = text_layer_create((GRect) {
-        .origin = { 100, 80 },
-        .size = { 15, 15 }
+        .origin = { 90, 75 },
+        .size = { 20, 20 }
     });
 
     sleepZZZs[2] = text_layer_create((GRect) {
-        .origin = { 110, 70 },
-        .size = { 15, 15 }
+        .origin = { 98, 55 },
+        .size = { 20, 25 }
     });
 
     for (int z = 0; z < SLEEP_COUNT / SLEEP_COUNT_DIV; z++) {
         text_layer_set_text(sleepZZZs[z], "z");
         setTextLayerDefaults(sleepZZZs[z]);
     }
+
+    text_layer_set_font(sleepZZZs[0],fonts_get_system_font(FONT_KEY_GOTHIC_14));
+    text_layer_set_font(sleepZZZs[1],fonts_get_system_font(FONT_KEY_GOTHIC_18));
+    text_layer_set_font(sleepZZZs[2],fonts_get_system_font(FONT_KEY_GOTHIC_24));
 
     // move baby to center
     baby.x = SPRITE_STARTX;
