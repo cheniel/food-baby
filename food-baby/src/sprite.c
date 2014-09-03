@@ -262,7 +262,6 @@ static GRect getNextSadLocation() {
 
 // change icon based on direction of sprite
 static void sadAnimationStarted(Animation *animation, void *data) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "5");
     if (moveTo.origin.x > baby.x) {
         bitmap_layer_set_bitmap(spriteLayer, sadRight); // move right
     } else if (moveTo.origin.x < baby.x) {
@@ -272,30 +271,22 @@ static void sadAnimationStarted(Animation *animation, void *data) {
 
 static void sadAnimationStopped(Animation *animation, bool finished, void *data) {
     // update location of baby
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "6");
-
     GRect location = layer_get_frame(bitmap_layer_get_layer(spriteLayer));
-    baby.x = moveTo.origin.x;
-    baby.y = moveTo.origin.y;
+    baby.x = location.origin.x;
+    baby.y = location.origin.y;
 
     if (continueAnimation) { startAnimation(); } 
 }
 
 static void startSadAnimation() {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "destroying old sad animation");
     if (sadAnimation) { property_animation_destroy(sadAnimation); }
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "done");
 
     moveTo = getNextSadLocation();
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "1");
     sadAnimation = property_animation_create_layer_frame(
         bitmap_layer_get_layer(spriteLayer), NULL, &moveTo);
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "2");
     animation_set_handlers((Animation*) sadAnimation, sadAnimationHandlers, NULL);
     animation_set_duration((Animation*) sadAnimation, 2000);
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "3");
     animation_schedule((Animation*) sadAnimation);
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "4");
 }
 
 void stopAnimation() {
@@ -348,12 +339,12 @@ static void upAnimationStopped(Animation *animation, bool finished, void *data) 
 
 static void downAnimationStopped(Animation *animation, bool finished, void *data) {
     bitmap_layer_set_bitmap(spriteLayer, happyNormal); 
-    psleep(100);
-    bitmap_layer_set_bitmap(spriteLayer, happyPreJump); 
 
     jumpsMade++;
 
     if (jumpsMade < NUM_JUMPS) {
+        psleep(100);
+        bitmap_layer_set_bitmap(spriteLayer, happyPreJump); 
         animation_schedule((Animation*) up);
     } else {
         startAnimation(); // restart previous animations
