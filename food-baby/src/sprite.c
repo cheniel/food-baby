@@ -10,7 +10,6 @@
 /* ========================================================================== */
 
 // ---------------- Open Issues
-// shorten save time by saving whole structure
 
 // ---------------- System includes e.g., <stdio.h>
 #include <pebble.h>
@@ -68,6 +67,7 @@ static GBitmap *sadLeft;
 
 static PropertyAnimation *up;
 static PropertyAnimation *down;
+static int jumpsMade;
 
 static GBitmap *happyPreJump;
 static GBitmap *happyNormal;
@@ -273,8 +273,9 @@ static void sadAnimationStarted(Animation *animation, void *data) {
 
 static void sadAnimationStopped(Animation *animation, bool finished, void *data) {
     // update location of baby
-    baby.x = moveTo.origin.x;
-    baby.y = moveTo.origin.y;
+    GRect location = layer_get_frame(bitmap_layer_get_layer(spriteLayer));
+    baby.x = location.origin.x;
+    baby.y = location.origin.y;
 
     property_animation_destroy(sadAnimation);
 
@@ -297,44 +298,41 @@ void stopAnimation() {
 }
 
 void happyJumps() {
-    if (!up) { property_animation_destroy(up); }
-    if (!down) { property_animation_destroy(down); }
+    if (up) { property_animation_destroy(up); }
+    if (down) { property_animation_destroy(down); }
 
     stopAnimation(); // stop previous animations    
 
-    GRect base = GRect(baby.x, SPRITE_FLOOR, SPRITE_WIDTH, SPRITE_HEIGHT);
     GRect peak = GRect(baby.x, SPRITE_CEILING, SPRITE_WIDTH, SPRITE_HEIGHT);
-
     up = property_animation_create_layer_frame(
         bitmap_layer_get_layer(spriteLayer), NULL, &peak);
-
-    down = property_animation_create_layer_frame(
-        bitmap_layer_get_layer(spriteLayer), NULL, &base);
-
     animation_set_duration((Animation*) up, JUMP_AIR_TIME / 2);
-    animation_set_duration((Animation*) down, JUMP_AIR_TIME / 2);
-
     animation_set_curve((Animation*) up, AnimationCurveEaseIn);
-    animation_set_curve((Animation*) down, AnimationCurveEaseOut);
-
     animation_set_handlers((Animation*) up, upAnimationHandlers, NULL);
+
+    GRect base = GRect(baby.x, SPRITE_FLOOR, SPRITE_WIDTH, SPRITE_HEIGHT);
+    down = property_animation_create_layer_frame(
+        bitmap_layer_get_layer(spriteLayer), &peak, &base);
+    animation_set_duration((Animation*) down, JUMP_AIR_TIME / 2);
+    animation_set_curve((Animation*) down, AnimationCurveEaseOut);
     animation_set_handlers((Animation*) down, downAnimationHandlers, NULL);
 
-    for (int i = 0; i < NUM_JUMPS; i++) {
-        animation_schedule((Animation*) up);
-    }
+    jumpsMade = 0;
 
-    // this doesn't work here. right idea though.
-    // startAnimation(); // restart previous animations
+    animation_schedule((Animation*) up);
 }
 
 static void upAnimationStarted(Animation *animation, void *data) {
     // set up pre jump
-
+    bitmap_layer_set_bitmap(spriteLayer, happyPreJump); 
+    psleep(100);
+    bitmap_layer_set_bitmap(spriteLayer, happyNormal); 
+    psleep(100);    
+    bitmap_layer_set_bitmap(spriteLayer, happyJump); 
 }
 
 static void upAnimationStopped(Animation *animation, bool finished, void *data) {
-
+    animation_schedule((Animation*) down);
 }
 
 static void downAnimationStarted(Animation *animation, void *data) {
@@ -342,7 +340,18 @@ static void downAnimationStarted(Animation *animation, void *data) {
 }
 
 static void downAnimationStopped(Animation *animation, bool finished, void *data) {
+    bitmap_layer_set_bitmap(spriteLayer, happyNormal); 
+    psleep(100);
+    bitmap_layer_set_bitmap(spriteLayer, happyPreJump); 
 
+    jumpsMade++;
+
+
+    if (jumpsMade < NUM_JUMPS) {
+        animation_schedule((Animation*) up);
+    } else {
+        startAnimation(); // restart previous animations
+    }
 }
 
 void deinitSprite() {
@@ -363,10 +372,9 @@ void deinitSprite() {
 
     APP_LOG(APP_LOG_LEVEL_DEBUG, "freeing animations");
 
-    if (!sleepAnimation) { animation_destroy(sleepAnimation); }
-    if (!sadAnimation) { property_animation_destroy(sadAnimation); }
-    if (!up) { property_animation_destroy(up); }
-    if (!down) { property_animation_destroy(down); }
+    if (sleepAnimation) { animation_destroy(sleepAnimation); }
+    if (up) { property_animation_destroy(up); }
+    if (down) { property_animation_destroy(down); }
 }
 
 

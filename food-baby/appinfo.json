@@ -61,11 +61,6 @@
 			},
 			{
 				"type": "png",
-				"name": "PLACEHOLDER",
-				"file": "placeholder.png"
-			},
-			{
-				"type": "png",
 				"name": "WATER",
 				"file": "water.png"	
 			},

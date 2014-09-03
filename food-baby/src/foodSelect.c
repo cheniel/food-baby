@@ -37,6 +37,7 @@ static SimpleMenuLayer *menuLayer;
 static SimpleMenuSection menuSections[NUM_MENU_SECTIONS];
 static SimpleMenuItem foodGroups[NUM_FOOD_GROUPS];
 static SimpleMenuItem settings[NUM_SETTINGS];
+static bool foodSelected;
 
 extern ServingCount userServings;
 
@@ -66,30 +67,35 @@ Window *foodInit() {
 
 static void grainSelectCallback(int index, void *ctx) {
   userServings.grains++;
+  foodSelected = true;
   makeRecommendation();
   window_stack_pop(ANIMATED_SETTING);
 }
 
 static void vegetableSelectCallback(int index, void *ctx) {
   userServings.veggies++;
+  foodSelected = true;
   makeRecommendation();
   window_stack_pop(ANIMATED_SETTING);
 }
 
 static void fruitSelectCallback(int index, void *ctx) {
   userServings.fruit++;
+  foodSelected = true;
   makeRecommendation();
   window_stack_pop(ANIMATED_SETTING);
 }
 
 static void dairySelectCallback(int index, void *ctx) {
   userServings.dairy++;
+  foodSelected = true;
   makeRecommendation();
   window_stack_pop(ANIMATED_SETTING);
 }
 
 static void proteinSelectCallback(int index, void *ctx) {
   userServings.protein++;
+  foodSelected = true;
   makeRecommendation();
   window_stack_pop(ANIMATED_SETTING);
 }
@@ -176,11 +182,17 @@ static void load(Window *window) {
   // Add it to the window for display
   layer_add_child(window_layer, simple_menu_layer_get_layer(menuLayer));
 
+  foodSelected = false;
 }
 
 static void unload(Window *window) {
   simple_menu_layer_destroy(menuLayer);
-  startAnimation();
+
+  if (foodSelected) {
+    happyJumps();
+  } else {
+    startAnimation();
+  }
 }
 
 char* getServingExample(char* foodGroup) {

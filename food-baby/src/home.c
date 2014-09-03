@@ -264,6 +264,7 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
     if (sidebarVisible) { 
         userServings.water++; // increment water count
+        happyJumps();
     } else { 
         showSidebar(); // or show sidebar
     } 
