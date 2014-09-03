@@ -16,7 +16,7 @@
 			{
 				"type": "png",
 				"name": "ICON",
-				"file": "foodbaby.png",
+				"file": "logoWhite.png",
 				"menuIcon" : true
 			},
 			{
@@ -28,6 +28,11 @@
 				"type": "png",
 				"name": "SPRITE_IDLE",
 				"file": "simpleSprite.png"
+			},
+			{
+				"type": "png",
+				"name": "SPRITE_ASLEEP",
+				"file": "asleep.png"
 			},
 			{
 				"type": "png",

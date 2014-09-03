@@ -53,6 +53,7 @@ static Animation *animation;
 static int sleepCounter;
 static TextLayer *sleepZZZs[SLEEP_COUNT];
 static bool continueAnimation;
+static GBitmap *sleepSprite;
 
 // ---------------- Private prototypes
 static void createSprite();
@@ -89,7 +90,9 @@ void initSprite(Layer* windowLayer) {
 
 static void createSprite() {
     spriteImg = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_IDLE);
-    spriteLayer = bitmap_layer_create(GRect(baby.x, baby.y, SPRITE_WIDTH, SPRITE_HEIGHT));
+    sleepSprite = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_ASLEEP);
+    spriteLayer = bitmap_layer_create(GRect(baby.x, baby.y, SPRITE_WIDTH, 
+        SPRITE_HEIGHT));
     bitmap_layer_set_bitmap(spriteLayer, spriteImg);
 }
 
@@ -133,17 +136,17 @@ static void sleepAnimSetup(struct Animation *animation) {
 
     // set up ZZZs
     sleepZZZs[0] = text_layer_create((GRect) {
-        .origin = { 90, 80 },
+        .origin = { 90, 90 },
         .size = { 15, 15 }
     });
 
     sleepZZZs[1] = text_layer_create((GRect) {
-        .origin = { 100, 70 },
+        .origin = { 100, 80 },
         .size = { 15, 15 }
     });
 
     sleepZZZs[2] = text_layer_create((GRect) {
-        .origin = { 110, 60 },
+        .origin = { 110, 70 },
         .size = { 15, 15 }
     });
 
@@ -157,7 +160,7 @@ static void sleepAnimSetup(struct Animation *animation) {
     baby.y = SPRITE_STARTY;
 
     // change icon to sleeping
-
+    bitmap_layer_set_bitmap(spriteLayer, sleepSprite);
 
     sleepCounter = 0;
 }
@@ -203,6 +206,7 @@ void stopAnimation() {
 void deinitSprite() {
     bitmap_layer_destroy(spriteLayer);
     gbitmap_destroy(spriteImg);
+    gbitmap_destroy(sleepSprite);
     animation_destroy(animation);
     stopAnimation();
 }
