@@ -49,7 +49,7 @@ static TextLayer *recText;
 static char *timeString;
 static char *dateString;
 static int secondsSinceLastAction;
-extern int minutesSinceLastShake;
+extern int minutesSinceLastActivity;
 static bool sidebarVisible;
 
 static BitmapLayer *sidebarLayer;
@@ -117,7 +117,7 @@ static void load(Window *window) {
     createSidebar(SIDEBAR_XPOS, SIDEBAR_YPOS);
 
     secondsSinceLastAction = 0;
-    minutesSinceLastShake = 0;
+    minutesSinceLastActivity = 0;
     sidebarVisible = false;
 
     addLayersToWindow();
@@ -255,6 +255,7 @@ static void hideSidebar() {
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
+    wakeUp();
     if (sidebarVisible) { 
         APP_LOG(APP_LOG_LEVEL_DEBUG, "showing food select window");
         stopAnimation();
@@ -265,6 +266,7 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
+    wakeUp();
     if (sidebarVisible) { 
         APP_LOG(APP_LOG_LEVEL_DEBUG, "incrementing water");
         userServings.water++; // increment water count
@@ -277,6 +279,7 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) { 
+    wakeUp();
     if (sidebarVisible) { 
         APP_LOG(APP_LOG_LEVEL_DEBUG, "opening logview");
         stopAnimation();
@@ -294,7 +297,7 @@ static void click_config_provider(void *context) {
 
 
 static void updateTime(struct tm *tick_time) {
-    minutesSinceLastShake++;
+    minutesSinceLastActivity++;
 
     strftime(timeString, MAX_TIME_CHAR, TIME_FORMAT, tick_time);
 

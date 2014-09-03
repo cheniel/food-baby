@@ -85,6 +85,8 @@ static GBitmap *happyPreJump;
 static GBitmap *happyNormal;
 static GBitmap *happyJump;
 
+extern int minutesSinceLastActivity;
+
 // ---------------- Private prototypes
 static void createSprite();
 static void sleepAnimInit();
@@ -271,7 +273,6 @@ static void sleepAnimSetup(struct Animation *animation) {
 
 static void sleepAnimUpdate(struct Animation *animation, 
     const uint32_t time_normalized) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "updating sleep animation");
 
     if (sleepCounter >= SLEEP_COUNT) {
         sleepCounter = 0;
@@ -516,5 +517,14 @@ static void updateLocation() {
     GRect location = layer_get_frame(bitmap_layer_get_layer(spriteLayer));
     baby.x = location.origin.x;
     baby.y = location.origin.y;    
+}
+
+void wakeUp() {
+    minutesSinceLastActivity = 0;
+
+    if (baby.state == spriteAsleep) {
+        stopAnimation();
+        startAnimation();
+    }
 }
 

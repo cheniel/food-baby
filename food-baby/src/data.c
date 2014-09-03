@@ -52,7 +52,7 @@ int activityToday;
 int activityRecord;
 bool minSatisfied;
 char *previousDate;
-int minutesSinceLastShake;
+int minutesSinceLastActivity;
 SpriteState currentSpriteState;
 
 // ---------------- Private prototypes
@@ -96,7 +96,7 @@ void initData() {
 }
 
 SpriteState getSpriteState() {
-	if (minutesSinceLastShake >= TIME_TO_SLEEP) {
+	if (minutesSinceLastActivity >= TIME_TO_SLEEP) {
 		currentSpriteState = spriteAsleep;
 	} else if (minSatisfied) {
 		currentSpriteState = spriteHappy;

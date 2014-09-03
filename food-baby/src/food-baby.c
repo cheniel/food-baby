@@ -20,6 +20,7 @@
 #include "foodSelect.h"
 #include "logview.h"
 #include "data.h"
+#include "sprite.h"
 
 // ---------------- Constant definitions
 
@@ -33,7 +34,7 @@ extern Window *foodSelect;
 extern Window *logview;
 extern int activityToday;
 extern int activityRecord;
-extern int minutesSinceLastShake;
+extern int minutesSinceLastActivity;
 
 // ---------------- Private prototypes
 int main(void);
@@ -51,10 +52,7 @@ int main(void) {
 
 static void tapHandler(AccelAxisType axis, int32_t direction) {
     activityToday++;
-    minutesSinceLastShake = 0;
-
-    // if the current state is sleeping
-        // wake up the sprite
+    wakeUp();
 
     if (activityToday > activityRecord) { activityRecord = activityToday; }
 }

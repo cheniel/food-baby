@@ -25,4 +25,6 @@ void stopAnimation();
 
 void happyJumps();
 
+void wakeUp();
+
 #endif // SPRITE_H
