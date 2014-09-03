@@ -40,7 +40,7 @@
 #define NUM_JUMPS 3
 #define JUMP_AIR_TIME 1000
 
-#define CONTENT_JUMP_CEILING 70
+#define CONTENT_JUMP_CEILING 80
 
 #define HAPPY_JUMP_CEILING SPRITE_CEILING
 
@@ -73,6 +73,8 @@ static PropertyAnimation *up;
 static PropertyAnimation *down;
 static int jumpsMade;
 
+static PropertyAnimation *contentUp;
+static PropertyAnimation *contentDown;
 static GBitmap *contentPreJump;
 static GBitmap *contentNormal;
 static GBitmap *contentJump;
@@ -88,18 +90,24 @@ static void sleepAnimSetup(struct Animation *animation);
 static void sleepAnimUpdate(struct Animation *animation, 
     const uint32_t time_normalized);
 static void sleepAnimTeardown(struct Animation *animation);
-static GRect getNextSadLocation();
+static void updateLocation();
+
+static GRect getNextLocation();
+
+static void startSadAnimation();
 static void sadAnimationStarted(Animation *animation, void *data);
 static void sadAnimationStopped(Animation *animation, bool finished, void *data);
+
 static void upAnimationStarted(Animation *animation, void *data);
 static void upAnimationStopped(Animation *animation, bool finished, void *data);
 static void downAnimationStopped(Animation *animation, bool finished, void *data);
+
 static void startContentAnimation();
+static void contentUpStarted(Animation *animation, void *data);
+static void contentUpStopped(Animation *animation, bool finished, void *data);
+static void contentDownStopped(Animation *animation, bool finished, void *data);
+
 static void startHappyAnimation();
-static void upAnimationStarted(Animation *animation, void *data);
-static void upAnimationStopped(Animation *animation, bool finished, void *data);
-static void downAnimationStopped(Animation *animation, bool finished, void *data);
-static void startSadAnimation();
 
 // ----------------- Animation Structures
 static const AnimationImplementation sleepAnimImpl = {
@@ -283,7 +291,18 @@ static void sleepAnimTeardown(struct Animation *animation) {
     if (continueAnimation) { startAnimation(); } 
 }
 
-static GRect getNextSadLocation() {
+static void startSadAnimation() {
+    if (sadAnimation) { property_animation_destroy(sadAnimation); }
+
+    moveTo = getNextLocation();
+    sadAnimation = property_animation_create_layer_frame(
+        bitmap_layer_get_layer(spriteLayer), NULL, &moveTo);
+    animation_set_handlers((Animation*) sadAnimation, sadAnimationHandlers, NULL);
+    animation_set_duration((Animation*) sadAnimation, 2000);
+    animation_schedule((Animation*) sadAnimation);
+}
+
+static GRect getNextLocation() {
     int x = randomInRange(0, bounds.size.w - SPRITE_WIDTH);
     return GRect(x, baby.y, SPRITE_WIDTH, SPRITE_HEIGHT);
 }
@@ -299,27 +318,58 @@ static void sadAnimationStarted(Animation *animation, void *data) {
 
 static void sadAnimationStopped(Animation *animation, bool finished, void *data) {
     // update location of baby
-    GRect location = layer_get_frame(bitmap_layer_get_layer(spriteLayer));
-    baby.x = location.origin.x;
-    baby.y = location.origin.y;
+    updateLocation();
 
     if (continueAnimation) { startAnimation(); } 
 }
 
-static void startSadAnimation() {
-    if (sadAnimation) { property_animation_destroy(sadAnimation); }
-
-    moveTo = getNextSadLocation();
-    sadAnimation = property_animation_create_layer_frame(
-        bitmap_layer_get_layer(spriteLayer), NULL, &moveTo);
-    animation_set_handlers((Animation*) sadAnimation, sadAnimationHandlers, NULL);
-    animation_set_duration((Animation*) sadAnimation, 2000);
-    animation_schedule((Animation*) sadAnimation);
-}
 
 static void startContentAnimation() {
+    if (contentUp) { property_animation_destroy(contentUp); }
+    if (contentDown) { property_animation_destroy(contentDown); }
 
+    moveTo = getNextLocation();
+
+    GRect peak = GRect((moveTo.origin.x - baby.x) / 2 + baby.x, 
+      CONTENT_JUMP_CEILING, SPRITE_WIDTH, SPRITE_HEIGHT);
+    contentUp = property_animation_create_layer_frame(
+        bitmap_layer_get_layer(spriteLayer), NULL, &peak);
+    animation_set_duration((Animation*) contentUp, JUMP_AIR_TIME / 2);
+    animation_set_curve((Animation*) contentUp, AnimationCurveEaseIn);
+    animation_set_handlers((Animation*) contentUp, contentUpHandlers, NULL);
+
+    GRect base = GRect(moveTo.origin.x, SPRITE_FLOOR, SPRITE_WIDTH, 
+        SPRITE_HEIGHT);
+    contentDown = property_animation_create_layer_frame(
+        bitmap_layer_get_layer(spriteLayer), &peak, &base);
+    animation_set_duration((Animation*) contentDown, JUMP_AIR_TIME / 2);
+    animation_set_curve((Animation*) contentDown, AnimationCurveEaseOut);
+    animation_set_handlers((Animation*) contentDown, contentDownHandlers, NULL);
+
+    animation_schedule((Animation*) contentUp);
 }
+
+static void contentUpStarted(Animation *animation, void *data) {
+    // set up pre jump
+    bitmap_layer_set_bitmap(spriteLayer, contentPreJump); 
+    psleep(100);
+    bitmap_layer_set_bitmap(spriteLayer, contentNormal); 
+    psleep(100);    
+    bitmap_layer_set_bitmap(spriteLayer, contentJump); 
+}
+
+static void contentUpStopped(Animation *animation, bool finished, void *data) {
+    animation_schedule((Animation*) contentDown);
+}
+
+static void contentDownStopped(Animation *animation, bool finished, void *data) {
+    bitmap_layer_set_bitmap(spriteLayer, contentNormal); 
+    
+    updateLocation();
+
+    if (continueAnimation) { startAnimation(); } 
+}
+
 
 static void startHappyAnimation() {
 
@@ -411,7 +461,13 @@ void deinitSprite() {
     if (sadAnimation) { property_animation_destroy(sadAnimation); }
     if (up) { property_animation_destroy(up); }
     if (down) { property_animation_destroy(down); }
+    if (contentUp) { property_animation_destroy(contentUp); }
+    if (contentDown) { property_animation_destroy(contentDown); }
 }
 
-
+static void updateLocation() {
+    GRect location = layer_get_frame(bitmap_layer_get_layer(spriteLayer));
+    baby.x = location.origin.x;
+    baby.y = location.origin.y;    
+}
 
