@@ -33,6 +33,7 @@
 
 #define SLEEP_COUNT 24
 #define SLEEP_COUNT_DIV 8
+#define SLEEP_Z_INC 1000
 
 #define ANIMATION_DURATION_MS 3000
 
@@ -147,7 +148,7 @@ static void sleepAnimSetup(struct Animation *animation) {
 
     sleepZZZs[2] = text_layer_create((GRect) {
         .origin = { 98, 55 },
-        .size = { 20, 25 }
+        .size = { 15, 25 }
     });
 
     for (int z = 0; z < SLEEP_COUNT / SLEEP_COUNT_DIV; z++) {
@@ -189,7 +190,7 @@ static void sleepAnimUpdate(struct Animation *animation,
         sleepCounter++;
     }
 
-    psleep(1000 / SLEEP_COUNT_DIV);
+    psleep(SLEEP_Z_INC / SLEEP_COUNT_DIV);
 }
 
 static void sleepAnimTeardown(struct Animation *animation) {
