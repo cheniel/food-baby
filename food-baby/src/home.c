@@ -293,13 +293,6 @@ static void click_config_provider(void *context) {
 static void updateTime(struct tm *tick_time) {
     minutesSinceLastShake++;
 
-    // TEMPORARY
-    if (minutesSinceLastShake >= TIME_TO_SLEEP) { 
-        text_layer_set_text(recText, "zzz");
-    } else {
-        makeRecommendation();
-    }
-
     strftime(timeString, MAX_TIME_CHAR, TIME_FORMAT, tick_time);
 
     /* remove preceding 0 if there is one */

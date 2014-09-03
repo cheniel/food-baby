@@ -138,7 +138,7 @@ void startAnimation() {
             sadAnimation = property_animation_create_layer_frame(
                 bitmap_layer_get_layer(spriteLayer), NULL, &moveTo);
             
-            animation_set_duration((Animation*) sadAnimation, 1000);
+            animation_set_duration((Animation*) sadAnimation, 2000);
             animation_set_handlers((Animation*) sadAnimation, sadAnimationHandlers, NULL);
             animation_schedule((Animation*) sadAnimation);
             break;
@@ -227,7 +227,6 @@ static void sleepAnimTeardown(struct Animation *animation) {
 static GRect getNextSadLocation() {
     int x = randomInRange(0, bounds.size.w - SPRITE_WIDTH);
     return GRect(x, baby.y, SPRITE_WIDTH, SPRITE_HEIGHT);
-
 }
 
 // change icon based on direction of sprite
@@ -244,7 +243,10 @@ static void sadAnimationStarted(Animation *animation, void *data) {
 }
 
 static void sadAnimationStopped(Animation *animation, bool finished, void *data) {
-    // change icon back to normal
+    // update location of baby
+    baby.x = moveTo.origin.x;
+    baby.y = moveTo.origin.y;
+
     if (continueAnimation) { startAnimation(); } 
 }
 
