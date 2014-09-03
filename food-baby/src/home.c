@@ -215,6 +215,8 @@ static void createSidebar(int x, int y) {
 }
 
 static void showSidebar() {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "showing sidebar");
+
     layer_add_child(windowLayer, bitmap_layer_get_layer(sidebarLayer));
     layer_add_child(windowLayer, bitmap_layer_get_layer(foodIconLayer));
     layer_add_child(windowLayer, bitmap_layer_get_layer(waterIconLayer));
@@ -254,6 +256,7 @@ static void hideSidebar() {
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
     if (sidebarVisible) { 
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "showing food select window");
         stopAnimation();
         goToFoodSelect(); // load food select window
     } else { 
@@ -263,6 +266,7 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
     if (sidebarVisible) { 
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "incrementing water");
         userServings.water++; // increment water count
         happyJumps();
     } else { 
@@ -274,6 +278,7 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) { 
     if (sidebarVisible) { 
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "opening logview");
         stopAnimation();
         goToLog(); // load log window
     } else { 

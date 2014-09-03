@@ -84,7 +84,6 @@ static void sadAnimationStarted(Animation *animation, void *data);
 static void sadAnimationStopped(Animation *animation, bool finished, void *data);
 static void upAnimationStarted(Animation *animation, void *data);
 static void upAnimationStopped(Animation *animation, bool finished, void *data);
-static void downAnimationStarted(Animation *animation, void *data);
 static void downAnimationStopped(Animation *animation, bool finished, void *data);
 static GRect getNextSadLocation();
 static void startSadAnimation();
@@ -107,7 +106,6 @@ static const AnimationHandlers upAnimationHandlers = {
 };
 
 static const AnimationHandlers downAnimationHandlers = {
-    .started = downAnimationStarted,
     .stopped = downAnimationStopped,
 };
 
@@ -264,6 +262,7 @@ static GRect getNextSadLocation() {
 
 // change icon based on direction of sprite
 static void sadAnimationStarted(Animation *animation, void *data) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "5");
     if (moveTo.origin.x > baby.x) {
         bitmap_layer_set_bitmap(spriteLayer, sadRight); // move right
     } else if (moveTo.origin.x < baby.x) {
@@ -273,22 +272,30 @@ static void sadAnimationStarted(Animation *animation, void *data) {
 
 static void sadAnimationStopped(Animation *animation, bool finished, void *data) {
     // update location of baby
-    GRect location = layer_get_frame(bitmap_layer_get_layer(spriteLayer));
-    baby.x = location.origin.x;
-    baby.y = location.origin.y;
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "6");
 
-    property_animation_destroy(sadAnimation);
+    GRect location = layer_get_frame(bitmap_layer_get_layer(spriteLayer));
+    baby.x = moveTo.origin.x;
+    baby.y = moveTo.origin.y;
 
     if (continueAnimation) { startAnimation(); } 
 }
 
 static void startSadAnimation() {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "destroying old sad animation");
+    if (sadAnimation) { property_animation_destroy(sadAnimation); }
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "done");
+
     moveTo = getNextSadLocation();
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "1");
     sadAnimation = property_animation_create_layer_frame(
         bitmap_layer_get_layer(spriteLayer), NULL, &moveTo);
-    animation_set_duration((Animation*) sadAnimation, 2000);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "2");
     animation_set_handlers((Animation*) sadAnimation, sadAnimationHandlers, NULL);
+    animation_set_duration((Animation*) sadAnimation, 2000);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "3");
     animation_schedule((Animation*) sadAnimation);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "4");
 }
 
 void stopAnimation() {
@@ -298,28 +305,32 @@ void stopAnimation() {
 }
 
 void happyJumps() {
-    if (up) { property_animation_destroy(up); }
-    if (down) { property_animation_destroy(down); }
+    if (!((up && animation_is_scheduled((Animation*) up)) 
+        || (down && animation_is_scheduled((Animation*) down)))) {
 
-    stopAnimation(); // stop previous animations    
+        stopAnimation(); // stop previous animations    
 
-    GRect peak = GRect(baby.x, SPRITE_CEILING, SPRITE_WIDTH, SPRITE_HEIGHT);
-    up = property_animation_create_layer_frame(
-        bitmap_layer_get_layer(spriteLayer), NULL, &peak);
-    animation_set_duration((Animation*) up, JUMP_AIR_TIME / 2);
-    animation_set_curve((Animation*) up, AnimationCurveEaseIn);
-    animation_set_handlers((Animation*) up, upAnimationHandlers, NULL);
+        if (up) { property_animation_destroy(up); }
+        if (down) { property_animation_destroy(down); }
 
-    GRect base = GRect(baby.x, SPRITE_FLOOR, SPRITE_WIDTH, SPRITE_HEIGHT);
-    down = property_animation_create_layer_frame(
-        bitmap_layer_get_layer(spriteLayer), &peak, &base);
-    animation_set_duration((Animation*) down, JUMP_AIR_TIME / 2);
-    animation_set_curve((Animation*) down, AnimationCurveEaseOut);
-    animation_set_handlers((Animation*) down, downAnimationHandlers, NULL);
+        GRect peak = GRect(baby.x, SPRITE_CEILING, SPRITE_WIDTH, SPRITE_HEIGHT);
+        up = property_animation_create_layer_frame(
+            bitmap_layer_get_layer(spriteLayer), NULL, &peak);
+        animation_set_duration((Animation*) up, JUMP_AIR_TIME / 2);
+        animation_set_curve((Animation*) up, AnimationCurveEaseIn);
+        animation_set_handlers((Animation*) up, upAnimationHandlers, NULL);
 
-    jumpsMade = 0;
+        GRect base = GRect(baby.x, SPRITE_FLOOR, SPRITE_WIDTH, SPRITE_HEIGHT);
+        down = property_animation_create_layer_frame(
+            bitmap_layer_get_layer(spriteLayer), &peak, &base);
+        animation_set_duration((Animation*) down, JUMP_AIR_TIME / 2);
+        animation_set_curve((Animation*) down, AnimationCurveEaseOut);
+        animation_set_handlers((Animation*) down, downAnimationHandlers, NULL);
 
-    animation_schedule((Animation*) up);
+        jumpsMade = 0;
+
+        animation_schedule((Animation*) up);
+    }
 }
 
 static void upAnimationStarted(Animation *animation, void *data) {
@@ -335,17 +346,12 @@ static void upAnimationStopped(Animation *animation, bool finished, void *data) 
     animation_schedule((Animation*) down);
 }
 
-static void downAnimationStarted(Animation *animation, void *data) {
-
-}
-
 static void downAnimationStopped(Animation *animation, bool finished, void *data) {
     bitmap_layer_set_bitmap(spriteLayer, happyNormal); 
     psleep(100);
     bitmap_layer_set_bitmap(spriteLayer, happyPreJump); 
 
     jumpsMade++;
-
 
     if (jumpsMade < NUM_JUMPS) {
         animation_schedule((Animation*) up);
@@ -371,8 +377,8 @@ void deinitSprite() {
     stopAnimation();
 
     APP_LOG(APP_LOG_LEVEL_DEBUG, "freeing animations");
-
     if (sleepAnimation) { animation_destroy(sleepAnimation); }
+    if (sadAnimation) { property_animation_destroy(sadAnimation); }
     if (up) { property_animation_destroy(up); }
     if (down) { property_animation_destroy(down); }
 }
