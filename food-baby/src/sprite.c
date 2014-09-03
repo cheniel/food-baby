@@ -1,11 +1,11 @@
 /* ========================================================================== */
 /* 
- * home.c
+ * sprite.c
  *
  * Project Name: Food Baby
  * Author: cheniel
  *
- * Home window initialization, operations, handlers.
+ * Functions that relate to sprite initialization and animation.
  */
 /* ========================================================================== */
 
@@ -40,6 +40,10 @@
 #define NUM_JUMPS 3
 #define JUMP_AIR_TIME 1000
 
+#define CONTENT_JUMP_CEILING 70
+
+#define HAPPY_JUMP_CEILING SPRITE_CEILING
+
 // ---------------- Structures/Types
 typedef struct SpriteInfo {
     int x;
@@ -69,6 +73,10 @@ static PropertyAnimation *up;
 static PropertyAnimation *down;
 static int jumpsMade;
 
+static GBitmap *contentPreJump;
+static GBitmap *contentNormal;
+static GBitmap *contentJump;
+
 static GBitmap *happyPreJump;
 static GBitmap *happyNormal;
 static GBitmap *happyJump;
@@ -80,12 +88,17 @@ static void sleepAnimSetup(struct Animation *animation);
 static void sleepAnimUpdate(struct Animation *animation, 
     const uint32_t time_normalized);
 static void sleepAnimTeardown(struct Animation *animation);
+static GRect getNextSadLocation();
 static void sadAnimationStarted(Animation *animation, void *data);
 static void sadAnimationStopped(Animation *animation, bool finished, void *data);
 static void upAnimationStarted(Animation *animation, void *data);
 static void upAnimationStopped(Animation *animation, bool finished, void *data);
 static void downAnimationStopped(Animation *animation, bool finished, void *data);
-static GRect getNextSadLocation();
+static void startContentAnimation();
+static void startHappyAnimation();
+static void upAnimationStarted(Animation *animation, void *data);
+static void upAnimationStopped(Animation *animation, bool finished, void *data);
+static void downAnimationStopped(Animation *animation, bool finished, void *data);
 static void startSadAnimation();
 
 // ----------------- Animation Structures
@@ -107,6 +120,16 @@ static const AnimationHandlers upAnimationHandlers = {
 
 static const AnimationHandlers downAnimationHandlers = {
     .stopped = downAnimationStopped,
+};
+
+
+static const AnimationHandlers contentUpHandlers = {
+    .started = contentUpStarted,
+    .stopped = contentUpStopped,
+};
+
+static const AnimationHandlers contentDownHandlers = {
+    .stopped = contentDownStopped,
 };
 
 /* ========================================================================== */
@@ -134,6 +157,9 @@ static void createSprite() {
     sleepSprite = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_ASLEEP);
     sadLeft = gbitmap_create_with_resource(RESOURCE_ID_SAD_LEFT);
     sadRight = gbitmap_create_with_resource(RESOURCE_ID_SAD_RIGHT);
+    contentPreJump = gbitmap_create_with_resource(RESOURCE_ID_CONTENT_PRE);
+    contentNormal = gbitmap_create_with_resource(RESOURCE_ID_CONTENT_NORM);
+    contentJump = gbitmap_create_with_resource(RESOURCE_ID_CONTENT_JUMP);
     happyPreJump = gbitmap_create_with_resource(RESOURCE_ID_HAPPY_PRE);
     happyNormal = gbitmap_create_with_resource(RESOURCE_ID_HAPPY_NORM);
     happyJump = gbitmap_create_with_resource(RESOURCE_ID_HAPPY_JUMP);
@@ -163,9 +189,11 @@ void startAnimation() {
             break;
         case spriteContent:
             APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteContent");
+            startContentAnimation();
             break;
         case spriteHappy:
             APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteHappy");
+            startHappyAnimation();
             break;
         default:
             APP_LOG(APP_LOG_LEVEL_ERROR, "startAnimation: INVALID STATE");
@@ -289,6 +317,14 @@ static void startSadAnimation() {
     animation_schedule((Animation*) sadAnimation);
 }
 
+static void startContentAnimation() {
+
+}
+
+static void startHappyAnimation() {
+
+}
+
 void stopAnimation() {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "stopping animation");
     continueAnimation = false;
@@ -357,6 +393,9 @@ void deinitSprite() {
     gbitmap_destroy(sadRight);
     gbitmap_destroy(spriteImg);
     gbitmap_destroy(sleepSprite);
+    gbitmap_destroy(contentPreJump);
+    gbitmap_destroy(contentNormal);
+    gbitmap_destroy(contentJump);
     gbitmap_destroy(happyPreJump);
     gbitmap_destroy(happyNormal);
     gbitmap_destroy(happyJump);

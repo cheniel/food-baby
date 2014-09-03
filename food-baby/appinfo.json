@@ -56,6 +56,21 @@
 			},
 			{
 				"type": "png",
+				"name": "CONTENT_PRE",
+				"file": "content-pre-jump.png"
+			},
+			{
+				"type": "png",
+				"name": "CONTENT_NORM",
+				"file": "content-normal.png"
+			},
+			{
+				"type": "png",
+				"name": "CONTENT_JUMP",
+				"file": "content-jump.png"
+			},
+			{
+				"type": "png",
 				"name": "SAD_LEFT",
 				"file": "sadLeft.png"
 			},
