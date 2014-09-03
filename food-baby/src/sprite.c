@@ -120,18 +120,18 @@ void initSprite(Layer* windowLayer) {
     baby = (SpriteInfo) {
         .x = SPRITE_X_CENTER,
         .y = SPRITE_FLOOR,
-        .state = spriteAsleep,
+        .state = spriteNone,
     };
 
     createSprite();
-    layer_add_child(window, bitmap_layer_get_layer(spriteLayer));
-
     sleepAnimInit();
 
     startAnimation();
 }
 
 static void createSprite() {
+
+    // create images associated with sprite
     spriteImg = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_IDLE);
     sleepSprite = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_ASLEEP);
     sadLeft = gbitmap_create_with_resource(RESOURCE_ID_SAD_LEFT);
@@ -143,6 +143,7 @@ static void createSprite() {
     spriteLayer = bitmap_layer_create(GRect(baby.x, baby.y, SPRITE_WIDTH, 
         SPRITE_HEIGHT));
     bitmap_layer_set_bitmap(spriteLayer, spriteImg);
+    layer_add_child(window, bitmap_layer_get_layer(spriteLayer));
 }
 
 void startAnimation() {
@@ -195,14 +196,10 @@ static void sleepAnimInit() {
         .size = { 15, 25 }
     });
 
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "created text layers");
-
     for (int z = 0; z < SLEEP_COUNT / SLEEP_COUNT_DIV; z++) {
         text_layer_set_text(sleepZZZs[z], "z");
         setTextLayerDefaults(sleepZZZs[z]);
     }
-
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "setting fonts");
 
     text_layer_set_font(sleepZZZs[0],fonts_get_system_font(FONT_KEY_GOTHIC_14));
     text_layer_set_font(sleepZZZs[1],fonts_get_system_font(FONT_KEY_GOTHIC_18));
@@ -279,6 +276,8 @@ static void sadAnimationStopped(Animation *animation, bool finished, void *data)
     baby.x = moveTo.origin.x;
     baby.y = moveTo.origin.y;
 
+    property_animation_destroy(sadAnimation);
+
     if (continueAnimation) { startAnimation(); } 
 }
 
@@ -298,8 +297,8 @@ void stopAnimation() {
 }
 
 void happyJumps() {
-    if (up != NULL) { property_animation_destroy(up); }
-    if (down != NULL) { property_animation_destroy(down); }
+    if (!up) { property_animation_destroy(up); }
+    if (!down) { property_animation_destroy(down); }
 
     stopAnimation(); // stop previous animations    
 
@@ -361,10 +360,13 @@ void deinitSprite() {
     }
 
     stopAnimation();
-    if (sleepAnimation != NULL) { animation_destroy(sleepAnimation); }
-    if (sadAnimation != NULL) { property_animation_destroy(sadAnimation); }
-    if (up != NULL) { property_animation_destroy(up); }
-    if (down != NULL) { property_animation_destroy(down); }
+
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "freeing animations");
+
+    if (!sleepAnimation) { animation_destroy(sleepAnimation); }
+    if (!sadAnimation) { property_animation_destroy(sadAnimation); }
+    if (!up) { property_animation_destroy(up); }
+    if (!down) { property_animation_destroy(down); }
 }
 
 
