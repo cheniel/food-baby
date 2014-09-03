@@ -79,6 +79,8 @@ static GBitmap *contentPreJump;
 static GBitmap *contentNormal;
 static GBitmap *contentJump;
 
+static PropertyAnimation *happyUp;
+static PropertyAnimation *happyDown;
 static GBitmap *happyPreJump;
 static GBitmap *happyNormal;
 static GBitmap *happyJump;
@@ -98,7 +100,6 @@ static void startSadAnimation();
 static void sadAnimationStarted(Animation *animation, void *data);
 static void sadAnimationStopped(Animation *animation, bool finished, void *data);
 
-static void upAnimationStarted(Animation *animation, void *data);
 static void upAnimationStopped(Animation *animation, bool finished, void *data);
 static void downAnimationStopped(Animation *animation, bool finished, void *data);
 
@@ -108,6 +109,9 @@ static void contentUpStopped(Animation *animation, bool finished, void *data);
 static void contentDownStopped(Animation *animation, bool finished, void *data);
 
 static void startHappyAnimation();
+static void happyUpStarted(Animation *animation, void *data);
+static void happyUpStopped(Animation *animation, bool finished, void *data);
+static void happyDownStopped(Animation *animation, bool finished, void *data);
 
 // ----------------- Animation Structures
 static const AnimationImplementation sleepAnimImpl = {
@@ -122,7 +126,7 @@ static const AnimationHandlers sadAnimationHandlers = {
 };
 
 static const AnimationHandlers upAnimationHandlers = {
-    .started = upAnimationStarted,
+    .started = happyUpStarted,
     .stopped = upAnimationStopped,
 };
 
@@ -138,6 +142,15 @@ static const AnimationHandlers contentUpHandlers = {
 
 static const AnimationHandlers contentDownHandlers = {
     .stopped = contentDownStopped,
+};
+
+static const AnimationHandlers happyUpHandlers = {
+    .started = happyUpStarted,
+    .stopped = happyUpStopped,
+};
+
+static const AnimationHandlers happyDownHandlers = {
+    .stopped = happyDownStopped,
 };
 
 /* ========================================================================== */
@@ -370,9 +383,50 @@ static void contentDownStopped(Animation *animation, bool finished, void *data) 
     if (continueAnimation) { startAnimation(); } 
 }
 
-
 static void startHappyAnimation() {
+    if (happyUp) { property_animation_destroy(happyUp); }
+    if (happyDown) { property_animation_destroy(happyDown); }
 
+    moveTo = getNextLocation();
+
+    GRect peak = GRect((moveTo.origin.x - baby.x) / 2 + baby.x, 
+      HAPPY_JUMP_CEILING, SPRITE_WIDTH, SPRITE_HEIGHT);
+    happyUp = property_animation_create_layer_frame(
+        bitmap_layer_get_layer(spriteLayer), NULL, &peak);
+    animation_set_duration((Animation*) happyUp, JUMP_AIR_TIME / 2);
+    animation_set_curve((Animation*) happyUp, AnimationCurveEaseIn);
+    animation_set_handlers((Animation*) happyUp, happyUpHandlers, NULL);
+
+    GRect base = GRect(moveTo.origin.x, SPRITE_FLOOR, SPRITE_WIDTH, 
+        SPRITE_HEIGHT);
+    happyDown = property_animation_create_layer_frame(
+        bitmap_layer_get_layer(spriteLayer), &peak, &base);
+    animation_set_duration((Animation*) happyDown, JUMP_AIR_TIME / 2);
+    animation_set_curve((Animation*) happyDown, AnimationCurveEaseOut);
+    animation_set_handlers((Animation*) happyDown, happyDownHandlers, NULL);
+
+    animation_schedule((Animation*) happyUp);
+}
+
+static void happyUpStarted(Animation *animation, void *data) {
+    // set up pre jump
+    bitmap_layer_set_bitmap(spriteLayer, happyPreJump); 
+    psleep(100);
+    bitmap_layer_set_bitmap(spriteLayer, happyNormal); 
+    psleep(100);    
+    bitmap_layer_set_bitmap(spriteLayer, happyJump); 
+}
+
+static void happyUpStopped(Animation *animation, bool finished, void *data) {
+    animation_schedule((Animation*) happyDown);
+}
+
+static void happyDownStopped(Animation *animation, bool finished, void *data) {
+    bitmap_layer_set_bitmap(spriteLayer, happyNormal); 
+    
+    updateLocation();
+
+    if (continueAnimation) { startAnimation(); } 
 }
 
 void stopAnimation() {
@@ -408,15 +462,6 @@ void happyJumps() {
 
         animation_schedule((Animation*) up);
     }
-}
-
-static void upAnimationStarted(Animation *animation, void *data) {
-    // set up pre jump
-    bitmap_layer_set_bitmap(spriteLayer, happyPreJump); 
-    psleep(100);
-    bitmap_layer_set_bitmap(spriteLayer, happyNormal); 
-    psleep(100);    
-    bitmap_layer_set_bitmap(spriteLayer, happyJump); 
 }
 
 static void upAnimationStopped(Animation *animation, bool finished, void *data) {
@@ -463,6 +508,8 @@ void deinitSprite() {
     if (down) { property_animation_destroy(down); }
     if (contentUp) { property_animation_destroy(contentUp); }
     if (contentDown) { property_animation_destroy(contentDown); }
+    if (happyUp) { property_animation_destroy(happyUp); }
+    if (happyDown) { property_animation_destroy(happyDown); }
 }
 
 static void updateLocation() {
