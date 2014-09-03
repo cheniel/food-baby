@@ -48,13 +48,20 @@ typedef struct SpriteInfo {
 static BitmapLayer *spriteLayer;
 static GBitmap *spriteImg;
 static Layer* window;
+static GRect bounds;
 static SpriteInfo baby;
-static Animation *animation;
 
+static Animation *sleepAnimation;
 static int sleepCounter;
 static TextLayer *sleepZZZs[SLEEP_COUNT];
 static bool continueAnimation;
 static GBitmap *sleepSprite;
+
+static PropertyAnimation *sadAnimation;
+static GRect moveTo;
+static GBitmap *sadRight;
+static GBitmap *sadLeft;
+
 
 // ---------------- Private prototypes
 static void createSprite();
@@ -62,6 +69,9 @@ static void sleepAnimSetup(struct Animation *animation);
 static void sleepAnimUpdate(struct Animation *animation, 
     const uint32_t time_normalized);
 static void sleepAnimTeardown(struct Animation *animation);
+static void sadAnimationStarted(Animation *animation, void *data);
+static void sadAnimationStopped(Animation *animation, bool finished, void *data);
+static GRect getNextSadLocation();
 
 // ----------------- Animation Structures
 static const AnimationImplementation sleepAnimImpl = {
@@ -70,10 +80,16 @@ static const AnimationImplementation sleepAnimImpl = {
     .teardown = sleepAnimTeardown,
 };
 
+static const AnimationHandlers sadAnimationHandlers = {
+    .started = sadAnimationStarted,
+    .stopped = sadAnimationStopped,
+};
+
 /* ========================================================================== */
 
 void initSprite(Layer* windowLayer) {
     window = windowLayer;
+    bounds = layer_get_bounds(windowLayer);
 
     baby = (SpriteInfo) {
         .x = SPRITE_STARTX,
@@ -84,7 +100,9 @@ void initSprite(Layer* windowLayer) {
     createSprite();
     layer_add_child(window, bitmap_layer_get_layer(spriteLayer));
 
-    animation = animation_create();
+    sleepAnimation = animation_create();
+    animation_set_duration(sleepAnimation, ANIMATION_DURATION_MS);
+    animation_set_implementation(sleepAnimation, &sleepAnimImpl);
 
     startAnimation();
 }
@@ -92,12 +110,17 @@ void initSprite(Layer* windowLayer) {
 static void createSprite() {
     spriteImg = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_IDLE);
     sleepSprite = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_ASLEEP);
+    sadLeft = gbitmap_create_with_resource(RESOURCE_ID_SAD_LEFT);
+    sadRight = gbitmap_create_with_resource(RESOURCE_ID_SAD_RIGHT);
+
     spriteLayer = bitmap_layer_create(GRect(baby.x, baby.y, SPRITE_WIDTH, 
         SPRITE_HEIGHT));
     bitmap_layer_set_bitmap(spriteLayer, spriteImg);
 }
 
 void startAnimation() {
+    if (sadAnimation != NULL) { property_animation_destroy(sadAnimation); }
+
     baby.state = getSpriteState();
 
     APP_LOG(APP_LOG_LEVEL_DEBUG, "determining baby state: ");
@@ -107,30 +130,29 @@ void startAnimation() {
     switch (baby.state) {
         case spriteAsleep:
             APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteAsleep");
-            animation_set_duration(animation, ANIMATION_DURATION_MS);
-            animation_set_implementation(animation, &sleepAnimImpl);
+            animation_schedule(sleepAnimation);
             break;
         case spriteSad:
             APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteSad");
-            animation_set_duration(animation, ANIMATION_DURATION_MS);
-            animation_set_implementation(animation, &sleepAnimImpl);
+            moveTo = getNextSadLocation();
+            sadAnimation = property_animation_create_layer_frame(
+                bitmap_layer_get_layer(spriteLayer), NULL, &moveTo);
+            
+            animation_set_duration((Animation*) sadAnimation, 1000);
+            animation_set_handlers((Animation*) sadAnimation, sadAnimationHandlers, NULL);
+            animation_schedule((Animation*) sadAnimation);
             break;
         case spriteContent:
             APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteContent");
-            animation_set_duration(animation, ANIMATION_DURATION_MS);
-            animation_set_implementation(animation, &sleepAnimImpl);
             break;
         case spriteHappy:
             APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteHappy");
-            animation_set_duration(animation, ANIMATION_DURATION_MS);
-            animation_set_implementation(animation, &sleepAnimImpl);
             break;
         default:
             APP_LOG(APP_LOG_LEVEL_ERROR, "startAnimation: INVALID STATE");
             break;
     }
 
-    animation_schedule(animation);
 }
 
 static void sleepAnimSetup(struct Animation *animation) {
@@ -202,18 +224,46 @@ static void sleepAnimTeardown(struct Animation *animation) {
     if (continueAnimation) { startAnimation(); } 
 }
 
+static GRect getNextSadLocation() {
+    int x = randomInRange(0, bounds.size.w - SPRITE_WIDTH);
+    return GRect(x, baby.y, SPRITE_WIDTH, SPRITE_HEIGHT);
+
+}
+
+// change icon based on direction of sprite
+static void sadAnimationStarted(Animation *animation, void *data) {
+    if (moveTo.origin.x > baby.x) {
+        bitmap_layer_set_bitmap(spriteLayer, sadRight); // move right
+
+    } else if (moveTo.origin.x < baby.x) {
+        bitmap_layer_set_bitmap(spriteLayer, sadLeft); // move left
+
+    } else {
+        bitmap_layer_set_bitmap(spriteLayer, spriteImg); // no move
+    }
+}
+
+static void sadAnimationStopped(Animation *animation, bool finished, void *data) {
+    // change icon back to normal
+    if (continueAnimation) { startAnimation(); } 
+}
+
 void stopAnimation() {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "stopping animation");
     continueAnimation = false;
-    animation_unschedule(animation);
+    animation_unschedule_all();
 }
 
 void deinitSprite() {
     bitmap_layer_destroy(spriteLayer);
+    gbitmap_destroy(sadLeft);
+    gbitmap_destroy(sadRight);
     gbitmap_destroy(spriteImg);
     gbitmap_destroy(sleepSprite);
-    animation_destroy(animation);
     stopAnimation();
+    if (sleepAnimation != NULL) { animation_destroy(sleepAnimation); }
+    if (sadAnimation != NULL) { property_animation_destroy(sadAnimation); }
+
 }
 
 

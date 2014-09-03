@@ -36,6 +36,16 @@
 			},
 			{
 				"type": "png",
+				"name": "SAD_RIGHT",
+				"file": "sadRight.png"	
+			},
+			{
+				"type": "png",
+				"name": "SAD_LEFT",
+				"file": "sadLeft.png"
+			},
+			{
+				"type": "png",
 				"name": "PLACEHOLDER",
 				"file": "placeholder.png"
 			},
