@@ -75,6 +75,7 @@ static GBitmap *happyJump;
 
 // ---------------- Private prototypes
 static void createSprite();
+static void sleepAnimInit();
 static void sleepAnimSetup(struct Animation *animation);
 static void sleepAnimUpdate(struct Animation *animation, 
     const uint32_t time_normalized);
@@ -125,9 +126,7 @@ void initSprite(Layer* windowLayer) {
     createSprite();
     layer_add_child(window, bitmap_layer_get_layer(spriteLayer));
 
-    sleepAnimation = animation_create();
-    animation_set_duration(sleepAnimation, ANIMATION_DURATION_MS);
-    animation_set_implementation(sleepAnimation, &sleepAnimImpl);
+    sleepAnimInit();
 
     startAnimation();
 }
@@ -147,7 +146,6 @@ static void createSprite() {
 }
 
 void startAnimation() {
-    if (sadAnimation != NULL) { property_animation_destroy(sadAnimation); }
 
     baby.state = getSpriteState();
 
@@ -176,7 +174,10 @@ void startAnimation() {
     }
 }
 
-static void sleepAnimSetup(struct Animation *animation) {
+static void sleepAnimInit() {
+    sleepAnimation = animation_create();
+    animation_set_duration(sleepAnimation, ANIMATION_DURATION_MS);
+    animation_set_implementation(sleepAnimation, &sleepAnimImpl);
 
     // set up ZZZs
     sleepZZZs[0] = text_layer_create((GRect) {
@@ -194,18 +195,29 @@ static void sleepAnimSetup(struct Animation *animation) {
         .size = { 15, 25 }
     });
 
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "created text layers");
+
     for (int z = 0; z < SLEEP_COUNT / SLEEP_COUNT_DIV; z++) {
         text_layer_set_text(sleepZZZs[z], "z");
         setTextLayerDefaults(sleepZZZs[z]);
     }
 
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "setting fonts");
+
     text_layer_set_font(sleepZZZs[0],fonts_get_system_font(FONT_KEY_GOTHIC_14));
     text_layer_set_font(sleepZZZs[1],fonts_get_system_font(FONT_KEY_GOTHIC_18));
     text_layer_set_font(sleepZZZs[2],fonts_get_system_font(FONT_KEY_GOTHIC_24));
+}
+
+static void sleepAnimSetup(struct Animation *animation) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "setting up sleep animation");
 
     // move baby to center
     baby.x = SPRITE_X_CENTER;
     baby.y = SPRITE_FLOOR;
+
+    layer_set_frame(bitmap_layer_get_layer(spriteLayer), 
+                    GRect(baby.x, baby.y, SPRITE_WIDTH, SPRITE_HEIGHT));
 
     // change icon to sleeping
     bitmap_layer_set_bitmap(spriteLayer, sleepSprite);
@@ -215,7 +227,8 @@ static void sleepAnimSetup(struct Animation *animation) {
 
 static void sleepAnimUpdate(struct Animation *animation, 
     const uint32_t time_normalized) {
-    
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "updating sleep animation");
+
     if (sleepCounter >= SLEEP_COUNT) {
         sleepCounter = 0;
 
@@ -238,9 +251,11 @@ static void sleepAnimUpdate(struct Animation *animation,
 
 static void sleepAnimTeardown(struct Animation *animation) {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "tearing down animation");
-    for (int z = 0; z < SLEEP_COUNT / SLEEP_COUNT_DIV; z++) { 
-        text_layer_destroy(sleepZZZs[z]); 
-    }
+
+    // remove all displayed Zs
+    for (int z = 0; z < SLEEP_COUNT / SLEEP_COUNT_DIV; z++) {
+        layer_remove_from_parent(text_layer_get_layer(sleepZZZs[z]));
+    }   
 
     if (continueAnimation) { startAnimation(); } 
 }
@@ -331,7 +346,6 @@ static void downAnimationStopped(Animation *animation, bool finished, void *data
 
 }
 
-
 void deinitSprite() {
     bitmap_layer_destroy(spriteLayer);
     gbitmap_destroy(sadLeft);
@@ -341,6 +355,11 @@ void deinitSprite() {
     gbitmap_destroy(happyPreJump);
     gbitmap_destroy(happyNormal);
     gbitmap_destroy(happyJump);
+
+    for (int z = 0; z < SLEEP_COUNT / SLEEP_COUNT_DIV; z++) { 
+        text_layer_destroy(sleepZZZs[z]); 
+    }
+
     stopAnimation();
     if (sleepAnimation != NULL) { animation_destroy(sleepAnimation); }
     if (sadAnimation != NULL) { property_animation_destroy(sadAnimation); }

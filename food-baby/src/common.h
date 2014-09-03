@@ -25,7 +25,7 @@
 #define PEBBLE_WIDTH 144
 #define PEBBLE_HEIGHT 168
 
-#define TIME_TO_SLEEP 4
+#define TIME_TO_SLEEP 1
 #define NUM_OF_FOOD_GROUPS 6
 
 // ---------------- Structures/Types
