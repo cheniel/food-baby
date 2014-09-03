@@ -40,9 +40,6 @@
 #define TIME_XPOS 0
 #define TIME_YPOS 0
 
-// remove later
-#define TIME_TO_SLEEP 7
-
 // ---------------- Structures/Types
 
 // ---------------- Private variables
@@ -165,7 +162,7 @@ static void addDateAndTime() {
     dateString = calloc(MAX_DATE_CHAR, sizeof(char));
     dateText = text_layer_create((GRect) { 
         .origin = { DATE_XPOS, DATE_YPOS }, 
-        .size = { bounds.size.w, 34 } 
+        .size = { bounds.size.w, 16 } 
     });
     setTextLayerDefaults(dateText);
     text_layer_set_font(dateText, 

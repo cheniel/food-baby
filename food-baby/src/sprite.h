@@ -19,7 +19,10 @@
 // ---------------- Prototypes/Macros
 void initSprite(Layer* windowLayer);
 void deinitSprite();
+
 void startAnimation();
 void stopAnimation();
+
+void happyJumps();
 
 #endif // SPRITE_H

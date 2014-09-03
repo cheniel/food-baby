@@ -41,6 +41,21 @@
 			},
 			{
 				"type": "png",
+				"name": "HAPPY_PRE",
+				"file": "happy-pre-jump.png"
+			},
+			{
+				"type": "png",
+				"name": "HAPPY_NORM",
+				"file": "happy-normal.png"
+			},
+			{
+				"type": "png",
+				"name": "HAPPY_JUMP",
+				"file": "happy-jump.png"
+			},
+			{
+				"type": "png",
 				"name": "SAD_LEFT",
 				"file": "sadLeft.png"
 			},

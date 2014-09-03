@@ -26,8 +26,9 @@
 // ---------------- Macro definitions
 #define SPRITE_WIDTH 45
 #define SPRITE_HEIGHT 45
-#define SPRITE_STARTX PEBBLE_WIDTH / 2 - SPRITE_WIDTH / 2
-#define SPRITE_STARTY 140 - SPRITE_HEIGHT
+#define SPRITE_X_CENTER PEBBLE_WIDTH / 2 - SPRITE_WIDTH / 2
+#define SPRITE_CEILING 50
+#define SPRITE_FLOOR 145 - SPRITE_HEIGHT
 #define SPRITE_XMIN 0
 #define SPRITE_XMAX PEBBLE_WIDTH - SPRITE_WIDTH
 
@@ -36,6 +37,9 @@
 #define SLEEP_Z_INC 1000
 
 #define ANIMATION_DURATION_MS 3000
+
+#define NUM_JUMPS 3
+#define JUMP_AIR_TIME 1000
 
 // ---------------- Structures/Types
 typedef struct SpriteInfo {
@@ -62,6 +66,12 @@ static GRect moveTo;
 static GBitmap *sadRight;
 static GBitmap *sadLeft;
 
+static PropertyAnimation *up;
+static PropertyAnimation *down;
+
+static GBitmap *happyPreJump;
+static GBitmap *happyNormal;
+static GBitmap *happyJump;
 
 // ---------------- Private prototypes
 static void createSprite();
@@ -71,7 +81,12 @@ static void sleepAnimUpdate(struct Animation *animation,
 static void sleepAnimTeardown(struct Animation *animation);
 static void sadAnimationStarted(Animation *animation, void *data);
 static void sadAnimationStopped(Animation *animation, bool finished, void *data);
+static void upAnimationStarted(Animation *animation, void *data);
+static void upAnimationStopped(Animation *animation, bool finished, void *data);
+static void downAnimationStarted(Animation *animation, void *data);
+static void downAnimationStopped(Animation *animation, bool finished, void *data);
 static GRect getNextSadLocation();
+static void startSadAnimation();
 
 // ----------------- Animation Structures
 static const AnimationImplementation sleepAnimImpl = {
@@ -85,6 +100,16 @@ static const AnimationHandlers sadAnimationHandlers = {
     .stopped = sadAnimationStopped,
 };
 
+static const AnimationHandlers upAnimationHandlers = {
+    .started = upAnimationStarted,
+    .stopped = upAnimationStopped,
+};
+
+static const AnimationHandlers downAnimationHandlers = {
+    .started = downAnimationStarted,
+    .stopped = downAnimationStopped,
+};
+
 /* ========================================================================== */
 
 void initSprite(Layer* windowLayer) {
@@ -92,8 +117,8 @@ void initSprite(Layer* windowLayer) {
     bounds = layer_get_bounds(windowLayer);
 
     baby = (SpriteInfo) {
-        .x = SPRITE_STARTX,
-        .y = SPRITE_STARTY,
+        .x = SPRITE_X_CENTER,
+        .y = SPRITE_FLOOR,
         .state = spriteAsleep,
     };
 
@@ -112,6 +137,9 @@ static void createSprite() {
     sleepSprite = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_ASLEEP);
     sadLeft = gbitmap_create_with_resource(RESOURCE_ID_SAD_LEFT);
     sadRight = gbitmap_create_with_resource(RESOURCE_ID_SAD_RIGHT);
+    happyPreJump = gbitmap_create_with_resource(RESOURCE_ID_HAPPY_PRE);
+    happyNormal = gbitmap_create_with_resource(RESOURCE_ID_HAPPY_NORM);
+    happyJump = gbitmap_create_with_resource(RESOURCE_ID_HAPPY_JUMP);
 
     spriteLayer = bitmap_layer_create(GRect(baby.x, baby.y, SPRITE_WIDTH, 
         SPRITE_HEIGHT));
@@ -134,13 +162,7 @@ void startAnimation() {
             break;
         case spriteSad:
             APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteSad");
-            moveTo = getNextSadLocation();
-            sadAnimation = property_animation_create_layer_frame(
-                bitmap_layer_get_layer(spriteLayer), NULL, &moveTo);
-            
-            animation_set_duration((Animation*) sadAnimation, 2000);
-            animation_set_handlers((Animation*) sadAnimation, sadAnimationHandlers, NULL);
-            animation_schedule((Animation*) sadAnimation);
+            startSadAnimation();
             break;
         case spriteContent:
             APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteContent");
@@ -152,7 +174,6 @@ void startAnimation() {
             APP_LOG(APP_LOG_LEVEL_ERROR, "startAnimation: INVALID STATE");
             break;
     }
-
 }
 
 static void sleepAnimSetup(struct Animation *animation) {
@@ -183,8 +204,8 @@ static void sleepAnimSetup(struct Animation *animation) {
     text_layer_set_font(sleepZZZs[2],fonts_get_system_font(FONT_KEY_GOTHIC_24));
 
     // move baby to center
-    baby.x = SPRITE_STARTX;
-    baby.y = SPRITE_STARTY;
+    baby.x = SPRITE_X_CENTER;
+    baby.y = SPRITE_FLOOR;
 
     // change icon to sleeping
     bitmap_layer_set_bitmap(spriteLayer, sleepSprite);
@@ -233,13 +254,9 @@ static GRect getNextSadLocation() {
 static void sadAnimationStarted(Animation *animation, void *data) {
     if (moveTo.origin.x > baby.x) {
         bitmap_layer_set_bitmap(spriteLayer, sadRight); // move right
-
     } else if (moveTo.origin.x < baby.x) {
         bitmap_layer_set_bitmap(spriteLayer, sadLeft); // move left
-
-    } else {
-        bitmap_layer_set_bitmap(spriteLayer, spriteImg); // no move
-    }
+    } 
 }
 
 static void sadAnimationStopped(Animation *animation, bool finished, void *data) {
@@ -250,11 +267,70 @@ static void sadAnimationStopped(Animation *animation, bool finished, void *data)
     if (continueAnimation) { startAnimation(); } 
 }
 
+static void startSadAnimation() {
+    moveTo = getNextSadLocation();
+    sadAnimation = property_animation_create_layer_frame(
+        bitmap_layer_get_layer(spriteLayer), NULL, &moveTo);
+    animation_set_duration((Animation*) sadAnimation, 2000);
+    animation_set_handlers((Animation*) sadAnimation, sadAnimationHandlers, NULL);
+    animation_schedule((Animation*) sadAnimation);
+}
+
 void stopAnimation() {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "stopping animation");
     continueAnimation = false;
     animation_unschedule_all();
 }
+
+void happyJumps() {
+    if (up != NULL) { property_animation_destroy(up); }
+    if (down != NULL) { property_animation_destroy(down); }
+
+    stopAnimation(); // stop previous animations    
+
+    GRect base = GRect(baby.x, SPRITE_FLOOR, SPRITE_WIDTH, SPRITE_HEIGHT);
+    GRect peak = GRect(baby.x, SPRITE_CEILING, SPRITE_WIDTH, SPRITE_HEIGHT);
+
+    up = property_animation_create_layer_frame(
+        bitmap_layer_get_layer(spriteLayer), NULL, &peak);
+
+    down = property_animation_create_layer_frame(
+        bitmap_layer_get_layer(spriteLayer), NULL, &base);
+
+    animation_set_duration((Animation*) up, JUMP_AIR_TIME / 2);
+    animation_set_duration((Animation*) down, JUMP_AIR_TIME / 2);
+
+    animation_set_curve((Animation*) up, AnimationCurveEaseIn);
+    animation_set_curve((Animation*) down, AnimationCurveEaseOut);
+
+    animation_set_handlers((Animation*) up, upAnimationHandlers, NULL);
+    animation_set_handlers((Animation*) down, downAnimationHandlers, NULL);
+
+    for (int i = 0; i < NUM_JUMPS; i++) {
+        animation_schedule((Animation*) up);
+    }
+
+    // this doesn't work here. right idea though.
+    // startAnimation(); // restart previous animations
+}
+
+static void upAnimationStarted(Animation *animation, void *data) {
+    // set up pre jump
+
+}
+
+static void upAnimationStopped(Animation *animation, bool finished, void *data) {
+
+}
+
+static void downAnimationStarted(Animation *animation, void *data) {
+
+}
+
+static void downAnimationStopped(Animation *animation, bool finished, void *data) {
+
+}
+
 
 void deinitSprite() {
     bitmap_layer_destroy(spriteLayer);
@@ -262,10 +338,14 @@ void deinitSprite() {
     gbitmap_destroy(sadRight);
     gbitmap_destroy(spriteImg);
     gbitmap_destroy(sleepSprite);
+    gbitmap_destroy(happyPreJump);
+    gbitmap_destroy(happyNormal);
+    gbitmap_destroy(happyJump);
     stopAnimation();
     if (sleepAnimation != NULL) { animation_destroy(sleepAnimation); }
     if (sadAnimation != NULL) { property_animation_destroy(sadAnimation); }
-
+    if (up != NULL) { property_animation_destroy(up); }
+    if (down != NULL) { property_animation_destroy(down); }
 }
 
 
