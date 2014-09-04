@@ -10,7 +10,6 @@
 /* ========================================================================== */
 
 // ---------------- Open Issues
-// shorten save time by saving whole structure
 
 // ---------------- System includes e.g., <stdio.h>
 #include <pebble.h>
@@ -256,23 +255,28 @@ static void hideSidebar() {
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
     wakeUp();
-    if (sidebarVisible) { 
-        APP_LOG(APP_LOG_LEVEL_DEBUG, "showing food select window");
-        stopAnimation();
-        goToFoodSelect(); // load food select window
-    } else { 
-        showSidebar(); // or show sidebar
+    if (animationIsReady()) {
+        if (sidebarVisible) { 
+            APP_LOG(APP_LOG_LEVEL_DEBUG, "showing food select window");
+            stopAnimation();
+            goToFoodSelect(); // load food select window
+        } else { 
+            showSidebar(); // or show sidebar
+        }
     } 
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
     wakeUp();
-    if (sidebarVisible) { 
-        APP_LOG(APP_LOG_LEVEL_DEBUG, "incrementing water");
-        userServings.water++; // increment water count
-        happyJumps();
-    } else { 
-        showSidebar(); // or show sidebar
+    if (animationIsReady()) {
+        if (sidebarVisible) { 
+            APP_LOG(APP_LOG_LEVEL_DEBUG, "incrementing water");
+            userServings.water++; // increment water count
+            hideSidebar();
+            happyJumps();
+        } else { 
+            showSidebar(); // or show sidebar
+        }
     } 
 
     makeRecommendation();
@@ -280,12 +284,14 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) { 
     wakeUp();
-    if (sidebarVisible) { 
-        APP_LOG(APP_LOG_LEVEL_DEBUG, "opening logview");
-        stopAnimation();
-        goToLog(); // load log window
-    } else { 
-        showSidebar(); // or show sidebar 
+    if (animationIsReady()) {
+        if (sidebarVisible) { 
+            APP_LOG(APP_LOG_LEVEL_DEBUG, "opening logview");
+            stopAnimation();
+            goToLog(); // load log window
+        } else { 
+            showSidebar(); // or show sidebar 
+        }
     }    
 }
 

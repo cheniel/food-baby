@@ -37,7 +37,7 @@
 
 #define ANIMATION_DURATION_MS 3000
 
-#define NUM_JUMPS 3
+#define NUM_JUMPS 1
 #define JUMP_AIR_TIME 1000
 
 #define CONTENT_JUMP_CEILING 80
@@ -86,6 +86,7 @@ static GBitmap *happyNormal;
 static GBitmap *happyJump;
 
 extern int minutesSinceLastActivity;
+static bool happyJumpHappening;
 
 // ---------------- Private prototypes
 static void createSprite();
@@ -169,6 +170,8 @@ void initSprite(Layer* windowLayer) {
 
     createSprite();
     sleepAnimInit();
+
+    happyJumpHappening = false;
 
     startAnimation();
 }
@@ -460,7 +463,7 @@ void happyJumps() {
         animation_set_handlers((Animation*) down, downAnimationHandlers, NULL);
 
         jumpsMade = 0;
-
+        happyJumpHappening = true;
         animation_schedule((Animation*) up);
     }
 }
@@ -479,6 +482,7 @@ static void downAnimationStopped(Animation *animation, bool finished, void *data
         bitmap_layer_set_bitmap(spriteLayer, happyPreJump); 
         animation_schedule((Animation*) up);
     } else {
+        happyJumpHappening = false;
         startAnimation(); // restart previous animations
     }
 }
@@ -517,6 +521,10 @@ static void updateLocation() {
     GRect location = layer_get_frame(bitmap_layer_get_layer(spriteLayer));
     baby.x = location.origin.x;
     baby.y = location.origin.y;    
+}
+
+bool animationIsReady() {
+    return !happyJumpHappening;
 }
 
 void wakeUp() {

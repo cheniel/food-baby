@@ -42,7 +42,7 @@ const ServingCount maxRecServings = {
 #define PKEY_FOOD_COUNT 1105551231
 #define PKEY_PREV_DATE 1108424242
 
-#define SATISFIED_THRES 4
+#define SATISFIED_THRES 3
 
 // ---------------- Structures/Types
 

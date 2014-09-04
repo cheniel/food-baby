@@ -26,5 +26,6 @@ void stopAnimation();
 void happyJumps();
 
 void wakeUp();
+bool animationIsReady();
 
 #endif // SPRITE_H
