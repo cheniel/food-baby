@@ -1,8 +1,12 @@
 /* ========================================================================== */
 /* 
- * File: sprite.h
+ * sprite.h
  *
+ * Project Name: Food Baby
+ * Author: cheniel
  *
+ * Declarations for public functions used to control sprites and access sprite
+ * state
  */
 /* ========================================================================== */
 #ifndef SPRITE_H
@@ -17,7 +21,10 @@
 // ---------------- Public Variables
 
 // ---------------- Prototypes/Macros
+
+
 void initSprite(Layer* windowLayer);
+
 void deinitSprite();
 
 void startAnimation();

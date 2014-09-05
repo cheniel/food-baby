@@ -23,6 +23,8 @@
 // ---------------- Constant definitions
 
 // ---------------- Macro definitions
+
+/* constants related to sprite locations and size */
 #define SPRITE_WIDTH 45
 #define SPRITE_HEIGHT 45
 #define SPRITE_X_CENTER PEBBLE_WIDTH / 2 - SPRITE_WIDTH / 2
@@ -31,20 +33,27 @@
 #define SPRITE_XMIN 0
 #define SPRITE_XMAX PEBBLE_WIDTH - SPRITE_WIDTH
 
-#define SLEEP_COUNT 24
-#define SLEEP_COUNT_DIV 8
-#define SLEEP_Z_INC 1000
+/* constants related to the sleep animation */
+#define SLEEP_COUNT 24 // number of animation refreshes before each Z appearance
+#define SLEEP_COUNT_DIV 8 // number of refreshes before new Z appears
+#define SLEEP_Z_INC 1000 // length of time (ms) between each new Z appearing
 
+/* length of sad sprite animation */
 #define ANIMATION_DURATION_MS 3000
 
+/* happy jump constants */
 #define NUM_JUMPS 1
 #define JUMP_AIR_TIME 1000
 
+/* height of jumps when sprite is in content state */
 #define CONTENT_JUMP_CEILING 80
 
+/* height of jumps when sprite is in happy state */
 #define HAPPY_JUMP_CEILING SPRITE_CEILING
 
 // ---------------- Structures/Types
+
+/* stores info about the sprite to be passed around various functions */
 typedef struct SpriteInfo {
     int x;
     int y;
@@ -52,112 +61,146 @@ typedef struct SpriteInfo {
 } SpriteInfo;
 
 // ---------------- Private variables
-static BitmapLayer *spriteLayer;
-static GBitmap *spriteImg;
+
+/* information about window */
 static Layer* window;
 static GRect bounds;
+
+/* sprite graphics and variables */
+static BitmapLayer *spriteLayer;
+static GBitmap *spriteImg;
 static SpriteInfo baby;
 
+/* used to determine in animation teardown if animation should repeat */
+static bool continueAnimation; 
+
+/* stores location to animate to */
+static GRect moveTo;
+
+/* images, animation, and bookkeeping for sleep animation */
 static Animation *sleepAnimation;
 static int sleepCounter;
 static TextLayer *sleepZZZs[SLEEP_COUNT];
-static bool continueAnimation;
 static GBitmap *sleepSprite;
 
+/* animations and sprite images for sad state */
 static PropertyAnimation *sadAnimation;
-static GRect moveTo;
 static GBitmap *sadRight;
 static GBitmap *sadLeft;
 
+/* animation and bookkeeping for happy state */
 static PropertyAnimation *up;
 static PropertyAnimation *down;
 static int jumpsMade;
+static bool happyJumpHappening;
 
+/* animations and sprite images for content state */
 static PropertyAnimation *contentUp;
 static PropertyAnimation *contentDown;
 static GBitmap *contentPreJump;
 static GBitmap *contentNormal;
 static GBitmap *contentJump;
 
+/* animations and sprite images for happy state */
 static PropertyAnimation *happyUp;
 static PropertyAnimation *happyDown;
 static GBitmap *happyPreJump;
 static GBitmap *happyNormal;
 static GBitmap *happyJump;
 
+/* minutes since last movement or button press */
 extern int minutesSinceLastActivity;
-static bool happyJumpHappening;
 
 // ---------------- Private prototypes
+
+/* sprite functions */
 static void createSprite();
+static void updateLocation();
+static GRect getNextLocation();
+
+/* sleep state functions */
 static void sleepAnimInit();
 static void sleepAnimSetup(struct Animation *animation);
 static void sleepAnimUpdate(struct Animation *animation, 
     const uint32_t time_normalized);
 static void sleepAnimTeardown(struct Animation *animation);
-static void updateLocation();
 
-static GRect getNextLocation();
-
+/* sad animation functions */
 static void startSadAnimation();
 static void sadAnimationStarted(Animation *animation, void *data);
 static void sadAnimationStopped(Animation *animation, bool finished, void *data);
 
+/* happy jump functions */
 static void upAnimationStopped(Animation *animation, bool finished, void *data);
 static void downAnimationStopped(Animation *animation, bool finished, void *data);
 
+/* content animation functions */
 static void startContentAnimation();
 static void contentUpStarted(Animation *animation, void *data);
 static void contentUpStopped(Animation *animation, bool finished, void *data);
 static void contentDownStopped(Animation *animation, bool finished, void *data);
 
+/* happy animation functions */
 static void startHappyAnimation();
 static void happyUpStarted(Animation *animation, void *data);
 static void happyUpStopped(Animation *animation, bool finished, void *data);
 static void happyDownStopped(Animation *animation, bool finished, void *data);
 
 // ----------------- Animation Structures
+
+/* sleep animation handler */
 static const AnimationImplementation sleepAnimImpl = {
     .setup = sleepAnimSetup,
     .update = sleepAnimUpdate,
     .teardown = sleepAnimTeardown,
 };
 
+/* sad animation handler */
 static const AnimationHandlers sadAnimationHandlers = {
     .started = sadAnimationStarted,
     .stopped = sadAnimationStopped,
 };
 
+/* handler for happy jump animation (when going up) */
 static const AnimationHandlers upAnimationHandlers = {
     .started = happyUpStarted,
     .stopped = upAnimationStopped,
 };
 
+/* handler for happy jump animation (when going down) */
 static const AnimationHandlers downAnimationHandlers = {
     .stopped = downAnimationStopped,
 };
 
-
+/* handler for content jump animation (when going up) */
 static const AnimationHandlers contentUpHandlers = {
     .started = contentUpStarted,
     .stopped = contentUpStopped,
 };
 
+/* handler for content jump animation (when going down) */
 static const AnimationHandlers contentDownHandlers = {
     .stopped = contentDownStopped,
 };
 
+/* handler for content jump animation (when going up) */
 static const AnimationHandlers happyUpHandlers = {
     .started = happyUpStarted,
     .stopped = happyUpStopped,
 };
 
+/* handler for content jump animation (when going down) */
 static const AnimationHandlers happyDownHandlers = {
     .stopped = happyDownStopped,
 };
 
 /* ========================================================================== */
 
+/* 
+ * initializes sprite, initializes bookkeeping and layers, starts animations 
+ * 
+ * param: layer to initialize sprite
+ */
 void initSprite(Layer* windowLayer) {
     window = windowLayer;
     bounds = layer_get_bounds(windowLayer);
@@ -169,16 +212,19 @@ void initSprite(Layer* windowLayer) {
     };
 
     createSprite();
-    sleepAnimInit();
+    sleepAnimInit(); // doesn't actually start sleep animation
 
     happyJumpHappening = false;
 
     startAnimation();
 }
 
+/* 
+ * initializes images for animations, puts sprite on window 
+ */
 static void createSprite() {
 
-    // create images associated with sprite
+    /* create images associated with sprite */
     spriteImg = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_IDLE);
     sleepSprite = gbitmap_create_with_resource(RESOURCE_ID_SPRITE_ASLEEP);
     sadLeft = gbitmap_create_with_resource(RESOURCE_ID_SAD_LEFT);
@@ -190,20 +236,29 @@ static void createSprite() {
     happyNormal = gbitmap_create_with_resource(RESOURCE_ID_HAPPY_NORM);
     happyJump = gbitmap_create_with_resource(RESOURCE_ID_HAPPY_JUMP);
 
+    /* add sprite to window */
     spriteLayer = bitmap_layer_create(GRect(baby.x, baby.y, SPRITE_WIDTH, 
         SPRITE_HEIGHT));
     bitmap_layer_set_bitmap(spriteLayer, spriteImg);
     layer_add_child(window, bitmap_layer_get_layer(spriteLayer));
 }
 
+/*
+ * Determine the state of the baby, then animate the state for the sprite
+ */
 void startAnimation() {
-
-    baby.state = getSpriteState();
-
     APP_LOG(APP_LOG_LEVEL_DEBUG, "determining baby state: ");
 
+    /* get the new state of the baby */
+    baby.state = getSpriteState();
+
+    /* 
+     * used to keep track of if the startAnimation should be called again at the
+     * animation teardown
+     */
     continueAnimation = true;
 
+    /* run animation associated with state */
     switch (baby.state) {
         case spriteAsleep:
             APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteAsleep");
@@ -227,27 +282,32 @@ void startAnimation() {
     }
 }
 
+/*
+ * initialize the components required to run the sleep animation
+ * does not actually run the animation.
+ */
 static void sleepAnimInit() {
-    sleepAnimation = animation_create();
+    sleepAnimation = animation_create();/* length of sad sprite duration */
     animation_set_duration(sleepAnimation, ANIMATION_DURATION_MS);
     animation_set_implementation(sleepAnimation, &sleepAnimImpl);
 
-    // set up ZZZs
+    // set up ZZZs text layers.
     sleepZZZs[0] = text_layer_create((GRect) {
-        .origin = { 85, 90 },
+        .origin = { 85, 100 },
         .size = { 15, 15 }
     });
 
     sleepZZZs[1] = text_layer_create((GRect) {
-        .origin = { 90, 75 },
+        .origin = { 90, 85 },
         .size = { 20, 20 }
     });
 
     sleepZZZs[2] = text_layer_create((GRect) {
-        .origin = { 98, 55 },
+        .origin = { 98, 65 },
         .size = { 15, 25 }
     });
 
+    /* set properties of text layers */
     for (int z = 0; z < SLEEP_COUNT / SLEEP_COUNT_DIV; z++) {
         text_layer_set_text(sleepZZZs[z], "z");
         setTextLayerDefaults(sleepZZZs[z]);

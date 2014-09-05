@@ -27,7 +27,7 @@
 			{
 				"type": "png",
 				"name": "SPRITE_IDLE",
-				"file": "simpleSprite.png"
+				"file": "content-normal.png"
 			},
 			{
 				"type": "png",
