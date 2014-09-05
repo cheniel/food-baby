@@ -21,10 +21,7 @@
 // ---------------- Public Variables
 
 // ---------------- Prototypes/Macros
-
-
 void initSprite(Layer* windowLayer);
-
 void deinitSprite();
 
 void startAnimation();

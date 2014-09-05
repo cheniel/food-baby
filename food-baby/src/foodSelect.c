@@ -5,7 +5,7 @@
  * Project Name: Food Baby
  * Author: cheniel
  *
- * 
+ * initialization and functions for food select window
  */
 /* ========================================================================== */
 
@@ -27,7 +27,7 @@
 #define NUM_MENU_SECTIONS 2
 #define NUM_FOOD_GROUPS 5
 #define NUM_SETTINGS 2
-#define MAX_COMPARE_SIZE 10
+#define MAX_COMPARE_SIZE 10 // for strings
 #define ANIMATED_SETTING true
 
 // ---------------- Structures/Types
@@ -42,9 +42,9 @@ static bool foodSelected;
 extern ServingCount userServings;
 
 // ---------------- Private prototypes
-static char* getServingExample(char* foodGroup);
 static void load(Window *window);
 static void unload(Window *window);
+
 static void grainSelectCallback(int index, void *ctx);
 static void vegetableSelectCallback(int index, void *ctx);
 static void fruitSelectCallback(int index, void *ctx);
@@ -53,8 +53,13 @@ static void proteinSelectCallback(int index, void *ctx);
 static void resetDailyCallback(int index, void *ctx);
 static void resetRecordCallback(int index, void *ctx);
 
+static char* getServingExample(char* foodGroup);
+
 /* ========================================================================== */
 
+/*
+ * initializes and returns food select window
+ */
 Window *foodInit() {
 	Window *window = window_create();
 	window_set_window_handlers(window, (WindowHandlers) {
@@ -65,6 +70,10 @@ Window *foodInit() {
 	return window;
 }
 
+/*
+ * triggered when grain selection is made.
+ * increment grain count, get new recommendation, pop window
+ */ 
 static void grainSelectCallback(int index, void *ctx) {
   userServings.grains++;
   foodSelected = true;
@@ -72,6 +81,10 @@ static void grainSelectCallback(int index, void *ctx) {
   window_stack_pop(ANIMATED_SETTING);
 }
 
+/*
+ * triggered when vegetable selection is made.
+ * increment vegetable count, get new recommendation, pop window
+ */ 
 static void vegetableSelectCallback(int index, void *ctx) {
   userServings.veggies++;
   foodSelected = true;
@@ -79,6 +92,10 @@ static void vegetableSelectCallback(int index, void *ctx) {
   window_stack_pop(ANIMATED_SETTING);
 }
 
+/*
+ * triggered when fruit selection is made.
+ * increment fruit count, get new recommendation, pop window
+ */ 
 static void fruitSelectCallback(int index, void *ctx) {
   userServings.fruit++;
   foodSelected = true;
@@ -86,6 +103,10 @@ static void fruitSelectCallback(int index, void *ctx) {
   window_stack_pop(ANIMATED_SETTING);
 }
 
+/*
+ * triggered when dairy selection is made.
+ * increment dairy count, get new recommendation, pop window
+ */ 
 static void dairySelectCallback(int index, void *ctx) {
   userServings.dairy++;
   foodSelected = true;
@@ -93,6 +114,10 @@ static void dairySelectCallback(int index, void *ctx) {
   window_stack_pop(ANIMATED_SETTING);
 }
 
+/*
+ * triggered when protein selection is made.
+ * increment protein count, get new recommendation, pop window
+ */ 
 static void proteinSelectCallback(int index, void *ctx) {
   userServings.protein++;
   foodSelected = true;
@@ -100,25 +125,35 @@ static void proteinSelectCallback(int index, void *ctx) {
   window_stack_pop(ANIMATED_SETTING);
 }
 
+/*
+ * triggered when reset daily data selection is made.
+ * reset nutrition and daily activity data, get new recommendation, pop window
+ */ 
 static void resetDailyCallback(int index, void *ctx) {
   resetDailyData();
   makeRecommendation();
   window_stack_pop(ANIMATED_SETTING);
 }
 
+/*
+ * triggered when reset record selection is made.
+ * reset activity record, get new recommendation, pop window
+ */ 
 static void resetRecordCallback(int index, void *ctx) {
   resetRecord();
   makeRecommendation();
   window_stack_pop(ANIMATED_SETTING);
 }
 
-
+/*
+ * set up menu layer, put in buttons
+ */
 static void load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_frame(window_layer);
 
+  // nutrition callbacks
   int menuItem = 0;
-
   foodGroups[menuItem++] = (SimpleMenuItem) {
     .title = "grains",
     .subtitle = getServingExample("grains"),
@@ -149,6 +184,7 @@ static void load(Window *window) {
     .callback = proteinSelectCallback,
   };
 
+  // reset data callbacks
   menuItem = 0;
   settings[menuItem++] = (SimpleMenuItem) {
     .title = "reset daily data",
@@ -179,12 +215,17 @@ static void load(Window *window) {
   menuLayer = simple_menu_layer_create(bounds, window, menuSections, 
     NUM_MENU_SECTIONS, NULL);
 
+  // used in unload to determine what function to call for home window
+  foodSelected = false; 
+
   // Add it to the window for display
   layer_add_child(window_layer, simple_menu_layer_get_layer(menuLayer));
-
-  foodSelected = false;
 }
 
+/*
+ * called when window is unloaded. calls happy jump if a food was selected,
+ * starts animation based on state otherwise.
+ */
 static void unload(Window *window) {
   simple_menu_layer_destroy(menuLayer);
 
@@ -195,6 +236,9 @@ static void unload(Window *window) {
   }
 }
 
+/*
+ * gets random serving example for food group given by string in parameter
+ */
 char* getServingExample(char* foodGroup) {
   char** examples;
 

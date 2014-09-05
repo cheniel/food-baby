@@ -44,12 +44,20 @@ static void tapHandler(AccelAxisType axis, int32_t direction);
 
 /* ========================================================================== */
 
+/*
+ * main for food-baby project.
+ * initializes app, loops app, deinitializes app
+ */
 int main(void) {
     init();
     app_event_loop();
     deinit();
 }
 
+/*
+ * handler called when pebble is shaken. increments activity for the day, sets
+ * new record if appropriate. Wakes up baby.
+ */
 static void tapHandler(AccelAxisType axis, int32_t direction) {
     activityToday++;
     wakeUp();
@@ -57,6 +65,9 @@ static void tapHandler(AccelAxisType axis, int32_t direction) {
     if (activityToday > activityRecord) { activityRecord = activityToday; }
 }
 
+/*
+ * initialize windows, tap service and home window.
+ */
 static void init(void) {
     initData();
     home = homeInit();
@@ -71,6 +82,9 @@ static void init(void) {
     window_stack_push(home, ANIMATION_SETTING);
 }
 
+/*
+ * free up resources
+ */
 static void deinit(void) {
     saveData();
     freeResources();

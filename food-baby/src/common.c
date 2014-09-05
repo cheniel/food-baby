@@ -28,20 +28,34 @@ Window *logview;
 
 /* ========================================================================== */
 
+/*
+ * opens log window by pushing it to window stack
+ */
 void goToLog() {
   window_stack_push(logview, ANIMATION_SETTING);
 }
 
+/*
+ * opens food select window by pushing it to window stack
+ */
 void goToFoodSelect() {
   window_stack_push(foodSelect, ANIMATION_SETTING);
 }
 
+/*
+ * sets text layer to "default" settings
+ * black background, white text, centered
+ */
 void setTextLayerDefaults(TextLayer *textlayer) {
   text_layer_set_text_color(textlayer, FONT_COLOR);
   text_layer_set_background_color(textlayer, BACKGROUND_COLOR);
   text_layer_set_text_alignment(textlayer, GTextAlignmentCenter);
 }
 
+/*
+ * takes in a food and returns a string containing the recommendation for the 
+ * food.
+ */
 char* getRecommendationForFood(Foods food) {
   switch (food) {
     case water:

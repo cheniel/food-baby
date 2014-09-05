@@ -47,9 +47,10 @@ static TextLayer *dateText;
 static TextLayer *recText;
 static char *timeString;
 static char *dateString;
-static int secondsSinceLastAction;
-extern int minutesSinceLastActivity;
+static int secondsSinceLastAction; // used for sidebar
 static bool sidebarVisible;
+
+extern int minutesSinceLastActivity; // used for sleeping state
 
 static BitmapLayer *sidebarLayer;
 static GBitmap *sidebarImg;
@@ -88,6 +89,9 @@ static void secondHandler(struct tm *tick_time);
 
 /* ========================================================================== */
 
+/*
+ * initializes home window and properties.
+ */
 Window *homeInit() {
     Window *home = window_create();
     window_set_click_config_provider(home, click_config_provider);
@@ -102,16 +106,20 @@ Window *homeInit() {
     return home;
 }
 
+/*
+ * called on window load
+ * sets up services and layers
+ */
 static void load(Window *window) {
     windowLayer = window_get_root_layer(window);
     bounds = layer_get_bounds(windowLayer);
 
-    /* initialize services */
+    /* manages clock and sidebar show/hide */
     tick_timer_service_subscribe(SECOND_UNIT, tick_handler); 
 
     addDateAndTime();
 
-    makeRecommendation();
+    makeRecommendation(); // sets up recommendation at bottom
     initSprite(windowLayer);
     createSidebar(SIDEBAR_XPOS, SIDEBAR_YPOS);
 
@@ -122,6 +130,10 @@ static void load(Window *window) {
     addLayersToWindow();
 }
 
+/*
+ * frees up and destroys resources used for window.
+ * unsubscribe to services.
+ */
 static void unload(Window *window) {
     free(timeString);
     free(dateString);
@@ -146,6 +158,9 @@ static void unload(Window *window) {
     tick_timer_service_unsubscribe();
 }
 
+/*
+ * puts date and time text layers on window.
+ */
 static void addDateAndTime() {
     /* create time text */
     timeString = calloc(MAX_TIME_CHAR, sizeof(char));
@@ -174,10 +189,15 @@ static void addDateAndTime() {
     updateDate(tm);
 }
 
+/* 
+ * sets up textlayer for recommendation 
+ */
 void makeRecommendation() {
     Foods recommendedFood = getRecommendation();
 
+    // create recommendation text layer if it doesn't exist
     if (!recText) {
+
         /* create recommendation text */
         recText = text_layer_create((GRect) { 
             .origin = { RECOMMENDATION_XPOS, RECOMMENDATION_YPOS }, 
@@ -191,6 +211,9 @@ void makeRecommendation() {
     text_layer_set_text(recText, getRecommendationForFood(recommendedFood));
 }
 
+/*
+ * create sidebar at x and y.
+ */
 static void createSidebar(int x, int y) {
     /* create sidebar */
     sidebarImg = gbitmap_create_with_resource(RESOURCE_ID_SIDEBAR);
@@ -213,6 +236,10 @@ static void createSidebar(int x, int y) {
     bitmap_layer_set_bitmap(logIconLayer, logIcon);
 }
 
+/*
+ * adds sidebar to window.
+ * createSidebar must have been called previously.
+ */
 static void showSidebar() {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "showing sidebar");
 
@@ -225,26 +252,10 @@ static void showSidebar() {
     sidebarVisible = true;
 }
 
-static void addLayersToWindow() {
-    /* add text layers to window */
-    layer_add_child(windowLayer, text_layer_get_layer(timeText));
-    layer_add_child(windowLayer, text_layer_get_layer(dateText));
-    layer_add_child(windowLayer, text_layer_get_layer(recText));
-}
-
-static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-    if (units_changed & SECOND_UNIT) { secondHandler(tick_time); }
-    if (units_changed & MINUTE_UNIT) { updateTime(tick_time); }
-    if (units_changed & DAY_UNIT) { updateDate(tick_time); }
-}
-
-static void secondHandler(struct tm *tick_time) {
-    if (sidebarVisible) {
-        secondsSinceLastAction++;
-        if (secondsSinceLastAction > SIDEBAR_DISPLAY_TIME) { hideSidebar(); }
-    }
-}
-
+/*
+ * removes sidebar from window
+ * does not destroy sidebar
+ */
 static void hideSidebar() {
     layer_remove_from_parent(bitmap_layer_get_layer(sidebarLayer));
     layer_remove_from_parent(bitmap_layer_get_layer(foodIconLayer));
@@ -253,6 +264,42 @@ static void hideSidebar() {
     sidebarVisible = false;
 }
 
+/*
+ * adds text layers to window
+ */
+static void addLayersToWindow() {
+    layer_add_child(windowLayer, text_layer_get_layer(timeText));
+    layer_add_child(windowLayer, text_layer_get_layer(dateText));
+    layer_add_child(windowLayer, text_layer_get_layer(recText));
+}
+
+/*
+ * tick handler.
+ * if the second changes, the second handler is called to count seconds and 
+ *      hide sidebar if appropriate
+ * if the minute changes, the time text changes
+ * if the date changes, the date text changes, and data is reset.
+ */
+static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+    if (units_changed & SECOND_UNIT) { secondHandler(tick_time); }
+    if (units_changed & MINUTE_UNIT) { updateTime(tick_time); }
+    if (units_changed & DAY_UNIT) { updateDate(tick_time); }
+}
+
+/*
+ * increments seconds since last action and hides sidebar if appropriate.
+ */
+static void secondHandler(struct tm *tick_time) {
+    if (sidebarVisible) {
+        secondsSinceLastAction++;
+        if (secondsSinceLastAction > SIDEBAR_DISPLAY_TIME) { hideSidebar(); }
+    }
+}
+
+/*
+ * handler for up click. Shows sidebar if sidebar is not visible. Goes to food
+ * select menu if it is.
+ */
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
     wakeUp();
     if (animationIsReady()) {
@@ -267,6 +314,10 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
     } 
 }
 
+/*
+ * handler for select click. Shows sidebar if sidebar is not visible. increments
+ * water count if it is.
+ */
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
     wakeUp();
     if (animationIsReady()) {
@@ -283,6 +334,10 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
     makeRecommendation();
 }
 
+/*
+ * handler for down click. Shows sidebar if sidebar is not visible. opens log
+ * view window if it is.
+ */
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) { 
     wakeUp();
     if (animationIsReady()) {
@@ -297,13 +352,18 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
     }    
 }
 
+/*
+ * sets up handlers for click events.
+ */ 
 static void click_config_provider(void *context) {
     window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
     window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
     window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
 } 
 
-
+/*
+ * updates the time text layer
+ */
 static void updateTime(struct tm *tick_time) {
     minutesSinceLastActivity++;
 
@@ -321,14 +381,22 @@ static void updateTime(struct tm *tick_time) {
     }
 }
 
+/*
+ * updates the date text layer. Resets data on date change
+ */
 static void updateDate(struct tm *tick_time) {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "updating date");
+    
     strftime(dateString, MAX_DATE_CHAR, DATE_FORMAT, tick_time);
+
+    // make date lowercase
     for(int i = 0; dateString[i]; i++){
       dateString[i] = tolower((unsigned char) dateString[i]);
     }
+    
     text_layer_set_text(dateText, dateString);    
 
+    // needs to be checked as this is called when app is opened
     if (isNewDate(dateString)) {
         APP_LOG(APP_LOG_LEVEL_DEBUG, "new date detected!");
         setNewDate(dateString);

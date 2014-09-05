@@ -53,6 +53,10 @@ static void addTextLayersToWindow(Layer* windowLayer);
 
 /* ========================================================================== */
 
+/*
+ * initializes window 
+ * returns the window
+ */
 Window *logInit() {
 	Window *window = window_create();
 	window_set_window_handlers(window, (WindowHandlers) {
@@ -64,6 +68,57 @@ Window *logInit() {
 	return window;
 }
 
+/*
+ * called when window is loaded
+ * sets up textlayer table, populates text
+ */
+static void load(Window *window) {
+  Layer *windowLayer = window_get_root_layer(window);
+  GRect bounds = layer_get_bounds(windowLayer);  
+
+  // initialize table
+  initializeTable();
+  setUpHeaders(bounds);
+
+  // put in nutrition information
+  int foodGroups = 1;
+  assignRow(foodGroups++, "water (8 oz)", userServings.water);
+  assignRow(foodGroups++, "grains", userServings.grains);
+  assignRow(foodGroups++, "veggies", userServings.veggies);
+  assignRow(foodGroups++, "fruits", userServings.fruit);
+  assignRow(foodGroups++, "dairy", userServings.dairy);
+  assignRow(foodGroups++, "protein", userServings.protein);
+
+  // put in activity information
+  int activityGroups = 8;
+  assignRow(activityGroups++, "today", activityToday);
+  assignRow(activityGroups++, "best", activityRecord); 
+
+  // add table to window
+  addTextLayersToWindow(windowLayer);
+}
+
+/*
+ * called when window is unloaded
+ * destroys the table and other layers
+ */
+static void unload(Window *window) {
+  text_layer_destroy(foodHeader);
+  text_layer_destroy(activityHeader);
+
+  // destroy table
+  for (int row = 0; row < NUM_ROWS; row++) {
+    text_layer_destroy(column1[row]);
+    text_layer_destroy(column2[row]);
+    free(col2values[row]);
+  }
+
+  startAnimation(); // starts up home screen animations again
+}
+
+/*
+ * initialize text layers for the table.
+ */
 static void initializeTable() {
   for (int row = 0; row < NUM_ROWS; row++) {
     column1[row] = text_layer_create((GRect) { 
@@ -84,6 +139,9 @@ static void initializeTable() {
   }
 }
 
+/*
+ * create food servings and activity headers that sit on top of table.
+ */
 static void setUpHeaders(GRect bounds) {
   // set up header rows
   foodHeader = text_layer_create((GRect) { 
@@ -99,43 +157,9 @@ static void setUpHeaders(GRect bounds) {
   text_layer_set_text(activityHeader, "activity");  
 }
 
-static void load(Window *window) {
-  Layer *windowLayer = window_get_root_layer(window);
-  GRect bounds = layer_get_bounds(windowLayer);  
-
-  // initialize table
-  initializeTable();
-  setUpHeaders(bounds);
-
-  int foodGroups = 1;
-  assignRow(foodGroups++, "water (8 oz)", userServings.water);
-  assignRow(foodGroups++, "grains", userServings.grains);
-  assignRow(foodGroups++, "veggies", userServings.veggies);
-  assignRow(foodGroups++, "fruits", userServings.fruit);
-  assignRow(foodGroups++, "dairy", userServings.dairy);
-  assignRow(foodGroups++, "protein", userServings.protein);
-
-  int activityGroups = 8;
-  assignRow(activityGroups++, "today", activityToday);
-  assignRow(activityGroups++, "best", activityRecord); 
-
-  addTextLayersToWindow(windowLayer);
-}
-
-static void unload(Window *window) {
-  text_layer_destroy(foodHeader);
-  text_layer_destroy(activityHeader);
-
-  // destroy table
-  for (int row = 0; row < NUM_ROWS; row++) {
-    text_layer_destroy(column1[row]);
-    text_layer_destroy(column2[row]);
-    free(col2values[row]);
-  }
-
-  startAnimation();
-}
-
+/*
+ * put text layers of table to window
+ */
 static void addTextLayersToWindow(Layer* windowLayer) {
   // add table to window
   for (int row = 0; row < NUM_ROWS; row++) {
@@ -148,6 +172,9 @@ static void addTextLayersToWindow(Layer* windowLayer) {
   layer_add_child(windowLayer, text_layer_get_layer(activityHeader));
 }
 
+/*
+ * add text to a row
+ */
 static void assignRow(int rowNumber, char* col1, int col2) {
   snprintf(col2values[rowNumber], MAX_COUNT_LENGTH, "%d", col2);
   text_layer_set_text(column1[rowNumber], col1);

@@ -399,14 +399,17 @@ static void startSadAnimation() {
 }
 
 /*
- * getNextLocation
+ * returns a random GRect which is used as the frame to animate to.
+ * keeps y axis the same, random x location on the screen. 
  */
 static GRect getNextLocation() {
     int x = randomInRange(0, bounds.size.w - SPRITE_WIDTH);
     return GRect(x, baby.y, SPRITE_WIDTH, SPRITE_HEIGHT);
 }
 
-// change icon based on direction of sprite
+/* 
+ * change icon based on direction of sprite for sad animation
+ */
 static void sadAnimationStarted(Animation *animation, void *data) {
     if (moveTo.origin.x > baby.x) {
         bitmap_layer_set_bitmap(spriteLayer, sadRight); // move right
@@ -415,20 +418,32 @@ static void sadAnimationStarted(Animation *animation, void *data) {
     } 
 }
 
+/*
+ * stop for sad animation
+ * updates the stored location of the baby
+ * starts the animation if appropriate
+ */
 static void sadAnimationStopped(Animation *animation, bool finished, void *data) {
-    // update location of baby
-    updateLocation();
+    updateLocation(); // update location of baby
 
     if (continueAnimation) { startAnimation(); } 
 }
 
-
+/*
+ * sets up content animation and then schedules it.
+ * gets a random location to move to
+ */
 static void startContentAnimation() {
     if (contentUp) { property_animation_destroy(contentUp); }
     if (contentDown) { property_animation_destroy(contentDown); }
 
+    /* get next random location to go to */
     moveTo = getNextLocation();
 
+    /* 
+     * set up the jump animation to move horizontally halfway to moveTo, and
+     * vertically to the content jump height
+     */
     GRect peak = GRect((moveTo.origin.x - baby.x) / 2 + baby.x, 
       CONTENT_JUMP_CEILING, SPRITE_WIDTH, SPRITE_HEIGHT);
     contentUp = property_animation_create_layer_frame(
@@ -437,6 +452,7 @@ static void startContentAnimation() {
     animation_set_curve((Animation*) contentUp, AnimationCurveEaseIn);
     animation_set_handlers((Animation*) contentUp, contentUpHandlers, NULL);
 
+    /* go to moveTo from peak */
     GRect base = GRect(moveTo.origin.x, SPRITE_FLOOR, SPRITE_WIDTH, 
         SPRITE_HEIGHT);
     contentDown = property_animation_create_layer_frame(
@@ -448,6 +464,10 @@ static void startContentAnimation() {
     animation_schedule((Animation*) contentUp);
 }
 
+/*
+ * start handler for content animation
+ * flash pre-jump, idle, then jump sprites
+ */
 static void contentUpStarted(Animation *animation, void *data) {
     // set up pre jump
     bitmap_layer_set_bitmap(spriteLayer, contentPreJump); 
@@ -457,24 +477,38 @@ static void contentUpStarted(Animation *animation, void *data) {
     bitmap_layer_set_bitmap(spriteLayer, contentJump); 
 }
 
+/* 
+ * stop handler for content animation. simply schedules down animation. 
+ */
 static void contentUpStopped(Animation *animation, bool finished, void *data) {
     animation_schedule((Animation*) contentDown);
 }
 
+/*
+ * stop handler for content animation. updates location and starts next 
+ * animation if necessary. Reset sprite to normal image.
+ */
 static void contentDownStopped(Animation *animation, bool finished, void *data) {
     bitmap_layer_set_bitmap(spriteLayer, contentNormal); 
-    
     updateLocation();
-
     if (continueAnimation) { startAnimation(); } 
 }
 
+/*
+ * start handler for happy animation.
+ * sets up animation and then schedules the animation.
+ */
 static void startHappyAnimation() {
     if (happyUp) { property_animation_destroy(happyUp); }
     if (happyDown) { property_animation_destroy(happyDown); }
 
+    /* get next random location to go to */
     moveTo = getNextLocation();
 
+    /* 
+     * set up the jump animation to move horizontally halfway to moveTo, and
+     * vertically to the content jump height
+     */
     GRect peak = GRect((moveTo.origin.x - baby.x) / 2 + baby.x, 
       HAPPY_JUMP_CEILING, SPRITE_WIDTH, SPRITE_HEIGHT);
     happyUp = property_animation_create_layer_frame(
@@ -483,6 +517,7 @@ static void startHappyAnimation() {
     animation_set_curve((Animation*) happyUp, AnimationCurveEaseIn);
     animation_set_handlers((Animation*) happyUp, happyUpHandlers, NULL);
 
+    /* go to moveTo from peak */
     GRect base = GRect(moveTo.origin.x, SPRITE_FLOOR, SPRITE_WIDTH, 
         SPRITE_HEIGHT);
     happyDown = property_animation_create_layer_frame(
@@ -494,6 +529,10 @@ static void startHappyAnimation() {
     animation_schedule((Animation*) happyUp);
 }
 
+/*
+ * start handler for happy animation
+ * flash pre-jump, idle, then jump sprites
+ */
 static void happyUpStarted(Animation *animation, void *data) {
     // set up pre jump
     bitmap_layer_set_bitmap(spriteLayer, happyPreJump); 
@@ -503,10 +542,17 @@ static void happyUpStarted(Animation *animation, void *data) {
     bitmap_layer_set_bitmap(spriteLayer, happyJump); 
 }
 
+/* 
+ * stop handler for happy animation. simply schedules down animation. 
+ */
 static void happyUpStopped(Animation *animation, bool finished, void *data) {
     animation_schedule((Animation*) happyDown);
 }
 
+/*
+ * stop handler for happy animation. updates location and starts next 
+ * animation if necessary. Reset sprite to normal image.
+ */
 static void happyDownStopped(Animation *animation, bool finished, void *data) {
     bitmap_layer_set_bitmap(spriteLayer, happyNormal); 
     
@@ -515,12 +561,22 @@ static void happyDownStopped(Animation *animation, bool finished, void *data) {
     if (continueAnimation) { startAnimation(); } 
 }
 
+/*
+ * stops animations and sets continue animation to false so animation teardowns
+ * don't call startAnimation
+ */
 void stopAnimation() {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "stopping animation");
     continueAnimation = false;
     animation_unschedule_all();
 }
 
+/*
+ * has the sprite jump NUM_JUMPS. Stops all current animations and then restarts
+ * it at the end.
+ * 
+ * called when a food is selected
+ */
 void happyJumps() {
     if (!((up && animation_is_scheduled((Animation*) up)) 
         || (down && animation_is_scheduled((Animation*) down)))) {
@@ -530,6 +586,10 @@ void happyJumps() {
         if (up) { property_animation_destroy(up); }
         if (down) { property_animation_destroy(down); }
 
+        /* 
+         * create peak by animating to a frame that is the same except y is the
+         * ceiling. used for up animation.
+         */
         GRect peak = GRect(baby.x, SPRITE_CEILING, SPRITE_WIDTH, SPRITE_HEIGHT);
         up = property_animation_create_layer_frame(
             bitmap_layer_get_layer(spriteLayer), NULL, &peak);
@@ -537,6 +597,9 @@ void happyJumps() {
         animation_set_curve((Animation*) up, AnimationCurveEaseIn);
         animation_set_handlers((Animation*) up, upAnimationHandlers, NULL);
 
+        /*
+         * base is the baby's current location. used for down animation
+         */
         GRect base = GRect(baby.x, SPRITE_FLOOR, SPRITE_WIDTH, SPRITE_HEIGHT);
         down = property_animation_create_layer_frame(
             bitmap_layer_get_layer(spriteLayer), &peak, &base);
@@ -544,16 +607,27 @@ void happyJumps() {
         animation_set_curve((Animation*) down, AnimationCurveEaseOut);
         animation_set_handlers((Animation*) down, downAnimationHandlers, NULL);
 
-        jumpsMade = 0;
-        happyJumpHappening = true;
+        jumpsMade = 0; // keeps track of number of jumps
+
+        // used in another function to determine if this animation is happening
+        happyJumpHappening = true; 
+
         animation_schedule((Animation*) up);
     }
 }
 
+/* 
+ * stop animation for up animation for happy jumps. schedules down animation 
+ */
 static void upAnimationStopped(Animation *animation, bool finished, void *data) {
     animation_schedule((Animation*) down);
 }
 
+/*
+ * stop handler for down animation. repeats animation if not enough jumps have 
+ * occured, stops and starts animations based on sprite state if the correct 
+ * number.
+ */
 static void downAnimationStopped(Animation *animation, bool finished, void *data) {
     bitmap_layer_set_bitmap(spriteLayer, happyNormal); 
 
@@ -569,6 +643,9 @@ static void downAnimationStopped(Animation *animation, bool finished, void *data
     }
 }
 
+/* 
+ * cleans up everything releated to sprite and sprite animation 
+ */
 void deinitSprite() {
     bitmap_layer_destroy(spriteLayer);
     gbitmap_destroy(sadLeft);
@@ -599,16 +676,26 @@ void deinitSprite() {
     if (happyDown) { property_animation_destroy(happyDown); }
 }
 
+/*
+ * updates stateinfo location based on layer's current location
+ */
 static void updateLocation() {
     GRect location = layer_get_frame(bitmap_layer_get_layer(spriteLayer));
     baby.x = location.origin.x;
     baby.y = location.origin.y;    
 }
 
+/*
+ * returns true if the happy jump animation is not occuring (tends to cause 
+ * crash if something is done while happy jump is happening)
+ */
 bool animationIsReady() {
     return !happyJumpHappening;
 }
 
+/*
+ * function used to wake up sprite from sleep
+ */
 void wakeUp() {
     minutesSinceLastActivity = 0;
 

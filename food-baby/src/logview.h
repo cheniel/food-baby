@@ -20,6 +20,6 @@
 // ---------------- Public Variables
 
 // ---------------- Prototypes/Macros
-Window *logInit();
+Window *logInit(); 
 
 #endif // LOG_H

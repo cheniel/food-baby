@@ -1,8 +1,8 @@
 /* ========================================================================== */
 /* 
- * 
+ * data.c
  *
- *
+ * functions that have to do with persistent storage
  */
 /* ========================================================================== */
 
@@ -42,6 +42,7 @@ const ServingCount maxRecServings = {
 #define PKEY_FOOD_COUNT 1105551231
 #define PKEY_PREV_DATE 1108424242
 
+// number of food groups that need to be satisfied for sprite to be content
 #define SATISFIED_THRES 3
 
 // ---------------- Structures/Types
@@ -60,7 +61,9 @@ static bool spriteIsContent();
 
 /* ========================================================================== */
 
-
+/*
+ * read persistent data from pebble, set if unassigned.
+ */
 void initData() {
 	if (persist_exists(PKEY_FOOD_COUNT)) {
 		persist_read_data(PKEY_FOOD_COUNT, &userServings, sizeof(userServings));
@@ -95,13 +98,26 @@ void initData() {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "previousDate is %s", previousDate);
 }
 
+/*
+ * returns the sprite state based on the persistent data
+ */
 SpriteState getSpriteState() {
+
+	// if the pebble has been idle for TIME_TO_SLEEP minutes
+	// set sprite to asleep
 	if (minutesSinceLastActivity >= TIME_TO_SLEEP) {
 		currentSpriteState = spriteAsleep;
+
+	// if all of the minimum recommendations are satisfied
+	// set sprite to happy
 	} else if (minSatisfied) {
 		currentSpriteState = spriteHappy;
+
+	// if sprite should be content, set sprite as content
 	} else if (spriteIsContent()) {
 		currentSpriteState = spriteContent;
+
+	// else just set sprite as sad
 	} else {
 		currentSpriteState = spriteSad;
 	}
@@ -109,6 +125,10 @@ SpriteState getSpriteState() {
 	return currentSpriteState;
 }
 
+/*
+ * determines if sprite should be content
+ * returns true if at least SATISFIED_THRES food groups are satisfied.
+ */
 static bool spriteIsContent() {
 	int remainingGroups = NUM_OF_FOOD_GROUPS;
 	int satisfiedGroups = 0;
@@ -158,6 +178,11 @@ static bool spriteIsContent() {
 	return false;
 }
 
+/*
+ * gets recommendation for next food to eat.
+ * returns the food group with the lowest user eated / recommendation ratio, 
+ * unless all max recommendations have been satisfied
+ */
 Foods getRecommendation() {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "getting recommendation");
 
@@ -191,8 +216,10 @@ Foods getRecommendation() {
 		bool allSatisfied = pwater >= 1.0 && pgrains >= 1.0 && pveggies >= 1.0 
 						&& pfruit >= 1.0 && pdairy >= 1.0 && pprotein >= 1.0;
 
+		// if not all proportions are satisfied
 		if (!allSatisfied) {
 
+			// return the food group with the lowest proportion
 			double lowestP = 1000.0;
 
 			if (pwater < lowestP) {
@@ -227,14 +254,23 @@ Foods getRecommendation() {
 
 			return recommendedFood;
 
+		// if min are satisfied (and all proportions are satisfied)
+		// means max recommendations are satisfied
 		} else if (minSatisfied) {
-			return none;
+			return none; 
+
+		// else, that means the min has been satisfied, so set min satisfied
+		// to true to check proportions again
 		} else {
 			minSatisfied = true;
 		}
 	}
 }
 
+/* 
+ * function that resets daily data
+ * saves data
+ */
 void resetDailyData() {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "reset data called");
  	userServings = (ServingCount) {
@@ -252,11 +288,18 @@ void resetDailyData() {
  	saveData();
 }
 
+/*
+ * resets record activity data
+ * saves record at 0
+ */
 void resetRecord() {
 	activityRecord = 0;
 	persist_write_int(PKEY_ACT_RECORD, activityRecord);
 }
 
+/*
+ *	saves all persistent data
+ */
 void saveData() {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "saving data");
 	persist_write_int(PKEY_ACT_TODAY, activityToday);
@@ -265,14 +308,24 @@ void saveData() {
 	persist_write_string(PKEY_PREV_DATE, previousDate);
 }
 
+/*
+ * frees the strings
+ */
 void freeResources() {
 	free(previousDate);
 }
 
+/*
+ * check if the date in the parameter is different from the date that was last
+ * stored in persistent data
+ */
 bool isNewDate(char* currentDate) {
 	return strncmp(currentDate, previousDate, MAX_DATE_CHAR);
 }
 
+/*
+ * set a new date in persistent data.
+ */
 void setNewDate(char* newDate) {
 	strncpy(previousDate, newDate, MAX_DATE_CHAR);
 	persist_write_string(PKEY_PREV_DATE, previousDate);
