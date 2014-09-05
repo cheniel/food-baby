@@ -2,6 +2,9 @@
 /* 
  * common.c 
  *
+ * Project Name: Food Baby
+ * Author: cheniel
+ *
  * contains common functions for food baby
  */
 /* ========================================================================== */

@@ -2,6 +2,9 @@
 /* 
  * food.h
  *
+ * Project Name: Food Baby
+ * Author: cheniel
+ *
  * public functions for food selection window
  */
 /* ========================================================================== */
