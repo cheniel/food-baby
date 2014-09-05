@@ -128,11 +128,13 @@ static void sleepAnimTeardown(struct Animation *animation);
 /* sad animation functions */
 static void startSadAnimation();
 static void sadAnimationStarted(Animation *animation, void *data);
-static void sadAnimationStopped(Animation *animation, bool finished, void *data);
+static void sadAnimationStopped(Animation *animation, bool finished, 
+    void *data);
 
 /* happy jump functions */
 static void upAnimationStopped(Animation *animation, bool finished, void *data);
-static void downAnimationStopped(Animation *animation, bool finished, void *data);
+static void downAnimationStopped(Animation *animation, bool finished, 
+    void *data);
 
 /* content animation functions */
 static void startContentAnimation();
@@ -393,7 +395,8 @@ static void startSadAnimation() {
     moveTo = getNextLocation(); // get randomly generated location
     sadAnimation = property_animation_create_layer_frame(
         bitmap_layer_get_layer(spriteLayer), NULL, &moveTo);
-    animation_set_handlers((Animation*) sadAnimation, sadAnimationHandlers, NULL);
+    animation_set_handlers((Animation*) sadAnimation, sadAnimationHandlers, 
+        NULL);
     animation_set_duration((Animation*) sadAnimation, 2000);
     animation_schedule((Animation*) sadAnimation);
 }
@@ -423,7 +426,9 @@ static void sadAnimationStarted(Animation *animation, void *data) {
  * updates the stored location of the baby
  * starts the animation if appropriate
  */
-static void sadAnimationStopped(Animation *animation, bool finished, void *data) {
+static void sadAnimationStopped(Animation *animation, bool finished, 
+    void *data) {
+
     updateLocation(); // update location of baby
 
     if (continueAnimation) { startAnimation(); } 
@@ -488,7 +493,7 @@ static void contentUpStopped(Animation *animation, bool finished, void *data) {
  * stop handler for content animation. updates location and starts next 
  * animation if necessary. Reset sprite to normal image.
  */
-static void contentDownStopped(Animation *animation, bool finished, void *data) {
+static void contentDownStopped(Animation *animation, bool finished, void *data){
     bitmap_layer_set_bitmap(spriteLayer, contentNormal); 
     updateLocation();
     if (continueAnimation) { startAnimation(); } 
@@ -619,7 +624,7 @@ void happyJumps() {
 /* 
  * stop animation for up animation for happy jumps. schedules down animation 
  */
-static void upAnimationStopped(Animation *animation, bool finished, void *data) {
+static void upAnimationStopped(Animation *animation, bool finished, void *data){
     animation_schedule((Animation*) down);
 }
 
@@ -628,7 +633,8 @@ static void upAnimationStopped(Animation *animation, bool finished, void *data) 
  * occured, stops and starts animations based on sprite state if the correct 
  * number.
  */
-static void downAnimationStopped(Animation *animation, bool finished, void *data) {
+static void downAnimationStopped(Animation *animation, bool finished, 
+    void *data) {
     bitmap_layer_set_bitmap(spriteLayer, happyNormal); 
 
     jumpsMade++;
