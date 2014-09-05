@@ -259,6 +259,7 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
         if (sidebarVisible) { 
             APP_LOG(APP_LOG_LEVEL_DEBUG, "showing food select window");
             stopAnimation();
+            hideSidebar();
             goToFoodSelect(); // load food select window
         } else { 
             showSidebar(); // or show sidebar
@@ -288,6 +289,7 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
         if (sidebarVisible) { 
             APP_LOG(APP_LOG_LEVEL_DEBUG, "opening logview");
             stopAnimation();
+            hideSidebar();
             goToLog(); // load log window
         } else { 
             showSidebar(); // or show sidebar 
