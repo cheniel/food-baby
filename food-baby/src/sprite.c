@@ -411,9 +411,9 @@ static GRect getNextLocation() {
  * change icon based on direction of sprite for sad animation
  */
 static void sadAnimationStarted(Animation *animation, void *data) {
-    if (moveTo.origin.x > baby.x) {
+    if (moveTo.origin.x < baby.x) {
         bitmap_layer_set_bitmap(spriteLayer, sadRight); // move right
-    } else if (moveTo.origin.x < baby.x) {
+    } else if (moveTo.origin.x > baby.x) {
         bitmap_layer_set_bitmap(spriteLayer, sadLeft); // move left
     } 
 }
