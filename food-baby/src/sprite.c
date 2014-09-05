@@ -291,7 +291,7 @@ static void sleepAnimInit() {
     animation_set_duration(sleepAnimation, ANIMATION_DURATION_MS);
     animation_set_implementation(sleepAnimation, &sleepAnimImpl);
 
-    // set up ZZZs text layers.
+    /* set up ZZZs text layers. */
     sleepZZZs[0] = text_layer_create((GRect) {
         .origin = { 85, 100 },
         .size = { 15, 15 }
@@ -318,6 +318,10 @@ static void sleepAnimInit() {
     text_layer_set_font(sleepZZZs[2],fonts_get_system_font(FONT_KEY_GOTHIC_24));
 }
 
+/*
+ * setup for sleep animation.
+ * move the sprite to the center, reset sleep counter
+ */
 static void sleepAnimSetup(struct Animation *animation) {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "setting up sleep animation");
 
@@ -334,9 +338,15 @@ static void sleepAnimSetup(struct Animation *animation) {
     sleepCounter = 0;
 }
 
+/*
+ * update for sleep animation
+ * add next Z text layer, if all are on the window, remove all of the text 
+ * layers.
+ */
 static void sleepAnimUpdate(struct Animation *animation, 
     const uint32_t time_normalized) {
 
+    /* if all zs are displayed */
     if (sleepCounter >= SLEEP_COUNT) {
         sleepCounter = 0;
 
@@ -357,6 +367,11 @@ static void sleepAnimUpdate(struct Animation *animation,
     psleep(SLEEP_Z_INC / SLEEP_COUNT_DIV);
 }
 
+/*
+ * teardown for sleep animation
+ * remove all z text layers from window
+ * if animations should continue, call startAnimation
+ */
 static void sleepAnimTeardown(struct Animation *animation) {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "tearing down animation");
 
@@ -368,10 +383,14 @@ static void sleepAnimTeardown(struct Animation *animation) {
     if (continueAnimation) { startAnimation(); } 
 }
 
+/*
+ * sets up and schedules sad animation
+ * based on randomly generated location.
+ */
 static void startSadAnimation() {
     if (sadAnimation) { property_animation_destroy(sadAnimation); }
 
-    moveTo = getNextLocation();
+    moveTo = getNextLocation(); // get randomly generated location
     sadAnimation = property_animation_create_layer_frame(
         bitmap_layer_get_layer(spriteLayer), NULL, &moveTo);
     animation_set_handlers((Animation*) sadAnimation, sadAnimationHandlers, NULL);
@@ -379,6 +398,9 @@ static void startSadAnimation() {
     animation_schedule((Animation*) sadAnimation);
 }
 
+/*
+ * getNextLocation
+ */
 static GRect getNextLocation() {
     int x = randomInRange(0, bounds.size.w - SPRITE_WIDTH);
     return GRect(x, baby.y, SPRITE_WIDTH, SPRITE_HEIGHT);
