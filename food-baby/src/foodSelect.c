@@ -20,6 +20,7 @@
 #include "servingSizeExamples.h"
 #include "home.h"
 #include "sprite.h"
+#include "strap/strap.h"
 
 // ---------------- Constant definitions
 
@@ -75,6 +76,7 @@ Window *foodInit() {
  * increment grain count, get new recommendation, pop window
  */ 
 static void grainSelectCallback(int index, void *ctx) {
+  strap_log_event("/grain-select");
   userServings.grains++;
   foodSelected = true;
   makeRecommendation();
@@ -86,6 +88,7 @@ static void grainSelectCallback(int index, void *ctx) {
  * increment vegetable count, get new recommendation, pop window
  */ 
 static void vegetableSelectCallback(int index, void *ctx) {
+  strap_log_event("/vegetable-select");
   userServings.veggies++;
   foodSelected = true;
   makeRecommendation();
@@ -97,6 +100,7 @@ static void vegetableSelectCallback(int index, void *ctx) {
  * increment fruit count, get new recommendation, pop window
  */ 
 static void fruitSelectCallback(int index, void *ctx) {
+  strap_log_event("/fruit-select");
   userServings.fruit++;
   foodSelected = true;
   makeRecommendation();
@@ -108,6 +112,7 @@ static void fruitSelectCallback(int index, void *ctx) {
  * increment dairy count, get new recommendation, pop window
  */ 
 static void dairySelectCallback(int index, void *ctx) {
+  strap_log_event("/dairy-select");
   userServings.dairy++;
   foodSelected = true;
   makeRecommendation();
@@ -119,6 +124,7 @@ static void dairySelectCallback(int index, void *ctx) {
  * increment protein count, get new recommendation, pop window
  */ 
 static void proteinSelectCallback(int index, void *ctx) {
+  strap_log_event("/protein-select");
   userServings.protein++;
   foodSelected = true;
   makeRecommendation();

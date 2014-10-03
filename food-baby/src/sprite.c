@@ -214,11 +214,18 @@ void initSprite(Layer* windowLayer) {
     };
 
     createSprite();
+
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "1");
+
     sleepAnimInit(); // doesn't actually start sleep animation
+
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "2");
 
     happyJumpHappening = false;
 
     startAnimation();
+
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "finish creating sprite");
 }
 
 /* 
@@ -243,6 +250,7 @@ static void createSprite() {
         SPRITE_HEIGHT));
     bitmap_layer_set_bitmap(spriteLayer, spriteImg);
     layer_add_child(window, bitmap_layer_get_layer(spriteLayer));
+
 }
 
 /*

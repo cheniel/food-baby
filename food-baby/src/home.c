@@ -20,6 +20,7 @@
 #include "data.h"
 #include "home.h"
 #include "sprite.h"
+#include "strap/strap.h"
 
 // ---------------- Constant definitions
 
@@ -305,6 +306,7 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
     if (animationIsReady()) {
         if (sidebarVisible) { 
             APP_LOG(APP_LOG_LEVEL_DEBUG, "showing food select window");
+            strap_log_event("/food-select");
             stopAnimation();
             hideSidebar();
             goToFoodSelect(); // load food select window
@@ -323,6 +325,7 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
     if (animationIsReady()) {
         if (sidebarVisible) { 
             APP_LOG(APP_LOG_LEVEL_DEBUG, "incrementing water");
+            strap_log_event("/water-select");
             userServings.water++; // increment water count
             hideSidebar();
             happyJumps();
@@ -343,6 +346,7 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
     if (animationIsReady()) {
         if (sidebarVisible) { 
             APP_LOG(APP_LOG_LEVEL_DEBUG, "opening logview");
+            strap_log_event("/log-select");
             stopAnimation();
             hideSidebar();
             goToLog(); // load log window
