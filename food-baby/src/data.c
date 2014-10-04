@@ -134,43 +134,43 @@ static bool spriteIsContent() {
 	int remainingGroups = NUM_OF_FOOD_GROUPS;
 	int satisfiedGroups = 0;
 
-	double pwater = (double) userServings.water / 
-					(double) minRecServings.water;
+	int pwater = userServings.water / 
+					minRecServings.water;
 	if (pwater >= 1.0) { satisfiedGroups++; }
 	if (satisfiedGroups >= SATISFIED_THRES) { return true; }
 	remainingGroups--;
 	if (remainingGroups + satisfiedGroups < SATISFIED_THRES) { return false; }
 
-	double pgrains = (double) userServings.grains / 
-					(double) minRecServings.grains;
+	int pgrains = userServings.grains / 
+					minRecServings.grains;
 	if (pgrains >= 1.0) { satisfiedGroups++; }
 	if (satisfiedGroups >= SATISFIED_THRES) { return true; }
 	remainingGroups--;
 	if (remainingGroups + satisfiedGroups < SATISFIED_THRES) { return false; }
 
-	double pveggies = (double) userServings.veggies / 
-					(double) minRecServings.veggies;
+	int pveggies = userServings.veggies / 
+					minRecServings.veggies;
 	if (pveggies >= 1.0) { satisfiedGroups++; }
 	if (satisfiedGroups >= SATISFIED_THRES) { return true; }
 	remainingGroups--;
 	if (remainingGroups + satisfiedGroups < SATISFIED_THRES) { return false; }
 
-	double pfruit = (double) userServings.fruit / 
-					(double) minRecServings.fruit;
+	int pfruit = userServings.fruit / 
+					minRecServings.fruit;
 	if (pfruit >= 1.0) { satisfiedGroups++; }
 	if (satisfiedGroups >= SATISFIED_THRES) { return true; }
 	remainingGroups--;
 	if (remainingGroups + satisfiedGroups < SATISFIED_THRES) { return false; }
 
-	double pdairy = (double) userServings.dairy / 
-					(double) minRecServings.dairy;
+	int pdairy = userServings.dairy / 
+					minRecServings.dairy;
 	if (pdairy >= 1.0) { satisfiedGroups++; }
 	if (satisfiedGroups >= SATISFIED_THRES) { return true; }
 	remainingGroups--;
 	if (remainingGroups + satisfiedGroups < SATISFIED_THRES) { return false; }
 
-	double pprotein = (double) userServings.protein / 
-					(double) minRecServings.protein;
+	int pprotein = userServings.protein / 
+					minRecServings.protein;
 	if (pprotein >= 1.0) { satisfiedGroups++; }
 	if (satisfiedGroups >= SATISFIED_THRES) { return true; }
 	remainingGroups--;
@@ -186,12 +186,12 @@ static bool spriteIsContent() {
  */
 Foods getRecommendation() {
 
-	double pwater;
-	double pgrains;
-	double pveggies;
-	double pfruit;
-	double pdairy;
-	double pprotein;
+	int pwater;
+	int pgrains;
+	int pveggies;
+	int pfruit;
+	int pdairy;
+	int pprotein;
 
 	ServingCount servings;
 	Foods recommendedFood = none;
@@ -206,12 +206,12 @@ Foods getRecommendation() {
 		}
 
 		// get proportions
-		pwater = (double) userServings.water / (double) servings.water;
-		pgrains = (double) userServings.grains / (double) servings.grains;
-		pveggies = (double) userServings.veggies / (double) servings.veggies;
-		pfruit = (double) userServings.fruit / (double) servings.fruit;
-		pdairy = (double) userServings.dairy / (double) servings.dairy;
-		pprotein = (double) userServings.protein / (double) servings.protein;
+		pwater = userServings.water / servings.water;
+		pgrains = userServings.grains / servings.grains;
+		pveggies = userServings.veggies / servings.veggies;
+		pfruit = userServings.fruit / servings.fruit;
+		pdairy = userServings.dairy / servings.dairy;
+		pprotein = userServings.protein / servings.protein;
 
 		bool allSatisfied = pwater >= 1.0 && pgrains >= 1.0 && pveggies >= 1.0 
 						&& pfruit >= 1.0 && pdairy >= 1.0 && pprotein >= 1.0;
@@ -220,7 +220,7 @@ Foods getRecommendation() {
 		if (!allSatisfied) {
 
 			// return the food group with the lowest proportion
-			double lowestP = 1000.0;
+			int lowestP = 1000.0;
 
 			if (pwater < lowestP) {
 				recommendedFood = water;
