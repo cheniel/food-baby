@@ -242,7 +242,6 @@ static void createSidebar(int x, int y) {
  * createSidebar must have been called previously.
  */
 static void showSidebar() {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "showing sidebar");
 
     layer_add_child(windowLayer, bitmap_layer_get_layer(sidebarLayer));
     layer_add_child(windowLayer, bitmap_layer_get_layer(foodIconLayer));
@@ -305,7 +304,6 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
     wakeUp();
     if (animationIsReady()) {
         if (sidebarVisible) { 
-            APP_LOG(APP_LOG_LEVEL_DEBUG, "showing food select window");
             strap_log_event("/food-select");
             stopAnimation();
             hideSidebar();
@@ -324,7 +322,6 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
     wakeUp();
     if (animationIsReady()) {
         if (sidebarVisible) { 
-            APP_LOG(APP_LOG_LEVEL_DEBUG, "incrementing water");
             strap_log_event("/water-select");
             userServings.water++; // increment water count
             hideSidebar();
@@ -345,7 +342,6 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
     wakeUp();
     if (animationIsReady()) {
         if (sidebarVisible) { 
-            APP_LOG(APP_LOG_LEVEL_DEBUG, "opening logview");
             strap_log_event("/log-select");
             stopAnimation();
             hideSidebar();
@@ -389,7 +385,6 @@ static void updateTime(struct tm *tick_time) {
  * updates the date text layer. Resets data on date change
  */
 static void updateDate(struct tm *tick_time) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "updating date");
     
     strftime(dateString, MAX_DATE_CHAR, DATE_FORMAT, tick_time);
 
@@ -402,7 +397,6 @@ static void updateDate(struct tm *tick_time) {
 
     // needs to be checked as this is called when app is opened
     if (isNewDate(dateString)) {
-        APP_LOG(APP_LOG_LEVEL_DEBUG, "new date detected!");
         setNewDate(dateString);
         resetDailyData();
         saveData();

@@ -80,15 +80,11 @@ static void init(void) {
     srand(time(NULL)); // for random ops. causes negligible memory leak... see:
     // http://forums.getpebble.com/discussion/10498/srand-rand-memory-leak
 
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "init strap");
-
     // for strap
     int in_size = app_message_inbox_size_maximum();
     int out_size = app_message_outbox_size_maximum();
     app_message_open(in_size, out_size);
     strap_init();
-
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "finished init strap");
 
     window_stack_push(home, ANIMATION_SETTING);
 }

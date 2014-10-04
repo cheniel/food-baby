@@ -215,17 +215,14 @@ void initSprite(Layer* windowLayer) {
 
     createSprite();
 
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "1");
 
     sleepAnimInit(); // doesn't actually start sleep animation
 
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "2");
 
     happyJumpHappening = false;
 
     startAnimation();
 
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "finish creating sprite");
 }
 
 /* 
@@ -257,7 +254,6 @@ static void createSprite() {
  * Determine the state of the baby, then animate the state for the sprite
  */
 void startAnimation() {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "determining baby state: ");
 
     /* get the new state of the baby */
     baby.state = getSpriteState();
@@ -271,23 +267,18 @@ void startAnimation() {
     /* run animation associated with state */
     switch (baby.state) {
         case spriteAsleep:
-            APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteAsleep");
             animation_schedule(sleepAnimation);
             break;
         case spriteSad:
-            APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteSad");
             startSadAnimation();
             break;
         case spriteContent:
-            APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteContent");
             startContentAnimation();
             break;
         case spriteHappy:
-            APP_LOG(APP_LOG_LEVEL_DEBUG, "\tspriteHappy");
             startHappyAnimation();
             break;
         default:
-            APP_LOG(APP_LOG_LEVEL_ERROR, "startAnimation: INVALID STATE");
             break;
     }
 }
@@ -333,7 +324,6 @@ static void sleepAnimInit() {
  * move the sprite to the center, reset sleep counter
  */
 static void sleepAnimSetup(struct Animation *animation) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "setting up sleep animation");
 
     // move baby to center
     baby.x = SPRITE_X_CENTER;
@@ -383,7 +373,6 @@ static void sleepAnimUpdate(struct Animation *animation,
  * if animations should continue, call startAnimation
  */
 static void sleepAnimTeardown(struct Animation *animation) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "tearing down animation");
 
     // remove all displayed Zs
     for (int z = 0; z < SLEEP_COUNT / SLEEP_COUNT_DIV; z++) {
@@ -579,7 +568,6 @@ static void happyDownStopped(Animation *animation, bool finished, void *data) {
  * don't call startAnimation
  */
 void stopAnimation() {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "stopping animation");
     continueAnimation = false;
     animation_unschedule_all();
 }
@@ -679,7 +667,6 @@ void deinitSprite() {
 
     stopAnimation();
 
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "freeing animations");
     if (sleepAnimation) { animation_destroy(sleepAnimation); }
     if (sadAnimation) { property_animation_destroy(sadAnimation); }
     if (up) { property_animation_destroy(up); }

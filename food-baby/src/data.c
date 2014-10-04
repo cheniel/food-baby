@@ -89,7 +89,6 @@ void initData() {
  	previousDate = calloc(MAX_DATE_CHAR, sizeof(char));
 
  	if (!persist_exists(PKEY_PREV_DATE)) {
- 		APP_LOG(APP_LOG_LEVEL_DEBUG, "No previousDate found.");
  		strncpy(previousDate, "unset", MAX_DATE_CHAR);
  		persist_write_string(PKEY_PREV_DATE, previousDate);
  	} else {
@@ -98,7 +97,6 @@ void initData() {
 
  	minSatisfied = false;
 
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "previousDate is %s", previousDate);
 }
 
 /*
@@ -187,7 +185,6 @@ static bool spriteIsContent() {
  * unless all max recommendations have been satisfied
  */
 Foods getRecommendation() {
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "getting recommendation");
 
 	double pwater;
 	double pgrains;
@@ -275,7 +272,6 @@ Foods getRecommendation() {
  * saves data
  */
 void resetDailyData() {
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "reset data called");
  	userServings = (ServingCount) {
  		.water = 0,
  		.grains = 0,
@@ -304,7 +300,6 @@ void resetRecord() {
  *	saves all persistent data
  */
 void saveData() {
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "saving data");
 	persist_write_int(PKEY_ACT_TODAY, activityToday);
 	persist_write_int(PKEY_ACT_RECORD, activityRecord);
 	persist_write_data(PKEY_FOOD_COUNT, &userServings, sizeof(userServings));
