@@ -9,3 +9,7 @@ Food Baby is Pebble's first nutrition app. Part-nutritionist, part-digital pet, 
 Finalist for the <a href="http://forum.xda-developers.com/smartwatch/pebble/xda-partners-pebble-developer-challenge-t2825784">Pebble XDA competition.</a>
 
 Check out the <a href="http://bit.ly/food-baby-thread">thread for this project</a> in the XDA forums.
+
+<a href="https://apps.getpebble.com/applications/5409b7c7954a63bd410000a0">
+  <img src="http://pblweb.com/badge/5409b7c7954a63bd410000a0/orange/medium/" alt="food baby is available on the Pebble appstore" />
+</a>
